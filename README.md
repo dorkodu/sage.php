@@ -1,8 +1,10 @@
 # Sage.php
 
-The PHP reference implementation for Sage, a data exchange approach for APIs created by [Dorkodu](https://dorkodu.com).
+<img src="resources/sage-dark.png" style="width: 67%; margin: 10px auto;">
 
-See more complete documentation at https://libre.dorkodu.com/sage.
+The PHP reference implementation for [Sage](https://libre.dorkodu.com/sage), a query-based data exchange protocol for APIs, created at [Dorkodu](https://dorkodu.com).
+
+See more complete documentation at [https://libre.dorkodu.com/sage.php](https://libre.dorkodu.com/sage.php).
 
 ## Getting Started
 
@@ -18,7 +20,7 @@ A general overview of Sage is available on the [website](https://libre.dorkodu.c
 
 ## Contributing
 
-We welcome your contributions, even if it is a simple idea. 
+We welcome your contributions, even if it is a simple idea.
 
 Learn how to [contribute](./.github/CONTRIBUTING.md).
 
