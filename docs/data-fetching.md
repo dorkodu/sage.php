@@ -1,17 +1,17 @@
 # Overview
-GraphQL is data-storage agnostic. You can use any underlying data storage engine, including SQL or NoSQL database, 
+Sage is data-storage agnostic. You can use any underlying data storage engine, including SQL or NoSQL database, 
 plain files or in-memory data structures.
 
-In order to convert the GraphQL query to PHP array, **graphql-php** traverses query fields (using depth-first algorithm) and 
+In order to convert the Sage query to PHP array, **Sage-php** traverses query fields (using depth-first algorithm) and 
 runs special **resolve** function on each field. This **resolve** function is provided by you as a part of 
 [field definition](type-system/object-types.md#field-configuration-options) or [query execution call](executing-queries.md#overview).
 
 Result returned by **resolve** function is directly included in the response (for scalars and enums)
 or passed down to nested fields (for objects).
 
-Let's walk through an example. Consider following GraphQL query:
+Let's walk through an example. Consider following Sage query:
 
-```graphql
+```Sage
 {
   lastStory {
     title
@@ -26,7 +26,7 @@ We need a Schema that can fulfill it. On the very top level the Schema contains 
 
 ```php
 <?php
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\ObjectType;
 
 $queryType = new ObjectType([
   'name' => 'Query',
@@ -56,8 +56,8 @@ Since **lastStory** is of composite type **BlogStory** this result is passed dow
 
 ```php
 <?php
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
 
 $blogStoryType = new ObjectType([
   'name' => 'BlogStory',
@@ -91,7 +91,7 @@ $blogStoryType = new ObjectType([
 Here **$blogStory** is the array returned by **lastStory** field above. 
 
 Again: in the real-world applications you would fetch user data from data store by **authorId** and return it.
-Also, note that you don't have to return arrays. You can return any value, **graphql-php** will pass it untouched
+Also, note that you don't have to return arrays. You can return any value, **Sage-php** will pass it untouched
 to nested resolvers.
 
 But then the question appears - field **title** has no **resolve** option. How is it resolved?
@@ -100,10 +100,10 @@ There is a default resolver for all fields. When you define your own **resolve**
 for a field you simply override this default resolver.
 
 # Default Field Resolver
-**graphql-php** provides following default field resolver:
+**Sage-php** provides following default field resolver:
 ```php
 <?php
-function defaultFieldResolver($objectValue, $args, $context, \GraphQL\Type\Definition\ResolveInfo $info)
+function defaultFieldResolver($objectValue, $args, $context, \Sage\Type\Definition\ResolveInfo $info)
     {
         $fieldName = $info->fieldName;
         $property  = null;
@@ -135,9 +135,9 @@ Sometimes it might be convenient to set default field resolver per type. You can
 
 ```php
 <?php
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ResolveInfo;
+use Sage\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
+use Sage\Type\Definition\ResolveInfo;
 
 $userType = new ObjectType([
   'name' => 'User',
@@ -168,7 +168,7 @@ Since: 0.9.0
 
 One of the most annoying problems with data fetching is a so-called 
 [N+1 problem](https://secure.phabricator.com/book/phabcontrib/article/n_plus_one/). <br>
-Consider following GraphQL query:
+Consider following Sage query:
 ```
 {
   topStories(limit: 10) {
@@ -183,7 +183,7 @@ Consider following GraphQL query:
 
 Naive field resolution process would require up to 10 calls to the underlying data store to fetch authors for all 10 stories.
 
-**graphql-php** provides tools to mitigate this problem: it allows you to defer actual field resolution to a later stage 
+**Sage-php** provides tools to mitigate this problem: it allows you to defer actual field resolution to a later stage 
 when one batched query could be executed instead of 10 distinct queries.
 
 Here is an example of **BlogStory** resolver for field **author** that uses deferring:
@@ -192,23 +192,23 @@ Here is an example of **BlogStory** resolver for field **author** that uses defe
 'resolve' => function($blogStory) {
     MyUserBuffer::add($blogStory['authorId']);
 
-    return new GraphQL\Deferred(function () use ($blogStory) {
+    return new Sage\Deferred(function () use ($blogStory) {
         MyUserBuffer::loadBuffered();
         return MyUserBuffer::get($blogStory['authorId']);
     });
 }
 ```
 
-In this example, we fill up the buffer with 10 author ids first. Then **graphql-php** continues 
+In this example, we fill up the buffer with 10 author ids first. Then **Sage-php** continues 
 resolving other non-deferred fields until there are none of them left.
 
-After that, it calls closures wrapped by `GraphQL\Deferred` which in turn load all buffered 
+After that, it calls closures wrapped by `Sage\Deferred` which in turn load all buffered 
 ids once (using SQL IN(?), Redis MGET or other similar tools) and returns final field value.
 
 Originally this approach was advocated by Facebook in their [Dataloader](https://github.com/facebook/dataloader)
 project. This solution enables very interesting optimizations at no cost. Consider the following query:
 
-```graphql
+```Sage
 {
   topStories(limit: 10) {
     author {
@@ -244,10 +244,10 @@ To start using this feature, switch facade method for query execution from
 
 ```php
 <?php
-use GraphQL\GraphQL;
-use GraphQL\Executor\ExecutionResult;
+use Sage\Sage;
+use Sage\Executor\ExecutionResult;
 
-$promise = GraphQL::promiseToExecute(
+$promise = Sage::promiseToExecute(
     $promiseAdapter,
     $schema, 
     $queryString, 
@@ -266,9 +266,9 @@ $promise->then(function(ExecutionResult $result) {
 Where **$promiseAdapter** is an instance of:
 
 * For [ReactPHP](https://github.com/reactphp/react) (requires **react/promise** as composer dependency): <br> 
-  `GraphQL\Executor\Promise\Adapter\ReactPromiseAdapter`
+  `Sage\Executor\Promise\Adapter\ReactPromiseAdapter`
 
 * Other platforms: write your own class implementing interface: <br> 
-  [`GraphQL\Executor\Promise\PromiseAdapter`](reference.md#graphqlexecutorpromisepromiseadapter). 
+  [`Sage\Executor\Promise\PromiseAdapter`](reference.md#Sageexecutorpromisepromiseadapter). 
 
-Then your **resolve** functions should return promises of your platform instead of `GraphQL\Deferred`s.
+Then your **resolve** functions should return promises of your platform instead of `Sage\Deferred`s.

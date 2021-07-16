@@ -1,5 +1,5 @@
 # Overview
-GraphQL is data-centric. On the very top level it is built around three major concepts: 
+Sage is data-centric. On the very top level it is built around three major concepts: 
 **Schema**, **Query** and **Mutation**.
  
 You are expected to express your application as **Schema** (aka Type System) and expose it
@@ -10,7 +10,7 @@ to this endpoint to request structured data and **Mutations** to perform changes
 ## Queries
 Queries are expressed in simple language that resembles JSON:
  
-```graphql
+```Sage
 {
   hero {
     name
@@ -34,7 +34,7 @@ It was designed to mirror the structure of expected response:
   }
 }
 ```
-**graphql-php** runtime parses Queries, makes sure that they are valid for given Type System 
+**Sage-php** runtime parses Queries, makes sure that they are valid for given Type System 
 and executes using [data fetching tools](data-fetching.md) provided by you 
 as a part of integration. Queries are supposed to be idempotent.
 
@@ -42,7 +42,7 @@ as a part of integration. Queries are supposed to be idempotent.
 Mutations use advanced features of the very same query language (like arguments and variables)  
 and have only semantic difference from Queries:
 
-```graphql
+```Sage
 mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
   createReview(episode: $ep, review: $review) {
     stars
@@ -52,7 +52,7 @@ mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
 ```
 Variables `$ep` and `$review` are sent alongside with mutation. Full HTTP request might look like this:
 ```json
-// POST /graphql-endpoint
+// POST /Sage-endpoint
 // Content-Type: application/javascript
 // 
 {
@@ -67,9 +67,9 @@ Variables `$ep` and `$review` are sent alongside with mutation. Full HTTP reques
 }
 ```
 As you see variables may include complex objects and they will be correctly validated by 
-**graphql-php** runtime.
+**Sage-php** runtime.
 
-Another nice feature of GraphQL mutations is that they also hold the query for data to be 
+Another nice feature of Sage mutations is that they also hold the query for data to be 
 returned after mutation. In our example mutation will return:
 ```
 {
@@ -81,7 +81,7 @@ returned after mutation. In our example mutation will return:
 ```
 
 # Type System
-Conceptually GraphQL type is a collection of fields. Each field in turn
+Conceptually Sage type is a collection of fields. Each field in turn
 has it's own type which allows to build complex hierarchies.
 
 Quick example on pseudo-language:
@@ -99,7 +99,7 @@ type User {
 }
 ```
 
-Type system is a heart of GraphQL integration. That's where **graphql-php** comes into play.
+Type system is a heart of Sage integration. That's where **Sage-php** comes into play.
  
 It provides following tools and primitives to describe your App as hierarchy of types:
 
@@ -109,11 +109,11 @@ It provides following tools and primitives to describe your App as hierarchy of 
  * Built-in scalar types: `ID`, `String`, `Int`, `Float`, `Boolean`
  * Built-in type modifiers: `ListOf` and `NonNull`
 
-Same example expressed in **graphql-php**:
+Same example expressed in **Sage-php**:
 ```php
 <?php
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
 
 $userType = new ObjectType([
     'name' => 'User',
@@ -134,6 +134,6 @@ $blogPostType = new ObjectType([
 ```
 
 # Further Reading
-To get deeper understanding of GraphQL concepts - [read the docs on official GraphQL website](http://graphql.org/learn/)
+To get deeper understanding of Sage concepts - [read the docs on official Sage website](http://Sage.org/learn/)
 
-To get started with **graphql-php** - continue to next section ["Getting Started"](getting-started.md)
+To get started with **Sage-php** - continue to next section ["Getting Started"](getting-started.md)

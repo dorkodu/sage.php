@@ -1,8 +1,8 @@
-# Errors in GraphQL
+# Errors in Sage
 
 Query execution process never throws exceptions. Instead, all errors are caught and collected. 
 After execution, they are available in **$errors** prop of 
-[`GraphQL\Executor\ExecutionResult`](reference.md#graphqlexecutorexecutionresult).
+[`Sage\Executor\ExecutionResult`](reference.md#Sageexecutorexecutionresult).
 
 When the result is converted to a serializable array using its **toArray()** method, all errors are 
 converted to arrays as well using default error formatting (see below). 
@@ -18,7 +18,7 @@ By default, each error entry is converted to an associative array with following
 [
     'message' => 'Error message',
     'extensions' => [
-        'category' => 'graphql'
+        'category' => 'Sage'
     ],
     'locations' => [
         ['line' => 1, 'column' => 2]
@@ -43,13 +43,13 @@ It contains a path from the very root field to actual field value producing an e
 As of version **0.10.0**, all exceptions thrown in resolvers are reported with generic message **"Internal server error"**.
 This is done to avoid information leak in production environments (e.g. database connection errors, file access errors, etc).
 
-Only exceptions implementing interface [`GraphQL\Error\ClientAware`](reference.md#graphqlerrorclientaware) and claiming themselves as **safe** will 
+Only exceptions implementing interface [`Sage\Error\ClientAware`](reference.md#Sageerrorclientaware) and claiming themselves as **safe** will 
 be reported with a full error message.
 
 For example:
 ```php
 <?php
-use GraphQL\Error\ClientAware;
+use Sage\Error\ClientAware;
 
 class MySafeException extends \Exception implements ClientAware
 {
@@ -85,7 +85,7 @@ When such exception is thrown it will be reported with a full error message:
 
 To change default **"Internal server error"** message to something else, use: 
 ```
-GraphQL\Error\FormattedError::setInternalErrorMessage("Unexpected error");
+Sage\Error\FormattedError::setInternalErrorMessage("Unexpected error");
 ```
 
 # Debugging tools
@@ -94,9 +94,9 @@ During development or debugging use `$result->toArray(DebugFlag::INCLUDE_DEBUG_M
 each formatted error entry. If you also want to add exception trace - pass flags instead:
 
 ```php
-use GraphQL\Error\DebugFlag;
+use Sage\Error\DebugFlag;
 $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;
-$result = GraphQL::executeQuery(/*args*/)->toArray($debug);
+$result = Sage::executeQuery(/*args*/)->toArray($debug);
 ```
 
 This will make each error entry to look like this:
@@ -125,12 +125,12 @@ This will make each error entry to look like this:
 If you prefer the first resolver exception to be re-thrown, use following flags:
 ```php
 <?php
-use GraphQL\GraphQL;
-use GraphQL\Error\DebugFlag;
+use Sage\Sage;
+use Sage\Error\DebugFlag;
 $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS;
 
 // Following will throw if there was an exception in resolver during execution:
-$result = GraphQL::executeQuery(/*args*/)->toArray($debug); 
+$result = Sage::executeQuery(/*args*/)->toArray($debug); 
 ```
 
 If you only want to re-throw Exceptions that are not marked as safe through the `ClientAware` interface, use
@@ -139,16 +139,16 @@ the flag `Debug::RETHROW_UNSAFE_EXCEPTIONS`.
 # Custom Error Handling and Formatting
 It is possible to define custom **formatter** and **handler** for result errors.
 
-**Formatter** is responsible for converting instances of [`GraphQL\Error\Error`](reference.md#graphqlerrorerror) 
+**Formatter** is responsible for converting instances of [`Sage\Error\Error`](reference.md#Sageerrorerror) 
 to an array. **Handler** is useful for error filtering and logging. 
 
 For example, these are default formatter and handler:
 
 ```php
 <?php
-use GraphQL\GraphQL;
-use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
+use Sage\Sage;
+use Sage\Error\Error;
+use Sage\Error\FormattedError;
 
 $myErrorFormatter = function(Error $error) {
     return FormattedError::createFromException($error);
@@ -158,7 +158,7 @@ $myErrorHandler = function(array $errors, callable $formatter) {
     return array_map($formatter, $errors);
 };
 
-$result = GraphQL::executeQuery(/* $args */)
+$result = Sage::executeQuery(/* $args */)
     ->setErrorFormatter($myErrorFormatter)
     ->setErrorsHandler($myErrorHandler)
     ->toArray(); 
@@ -169,23 +169,23 @@ decorated with same debugging information mentioned above.
 
 # Schema Errors
 So far we only covered errors which occur during query execution process. But schema definition can 
-also throw `GraphQL\Error\InvariantViolation` if there is an error in one of type definitions.
+also throw `Sage\Error\InvariantViolation` if there is an error in one of type definitions.
 
 Usually such errors mean that there is some logical error in your schema and it is the only case 
-when it makes sense to return `500` error code for GraphQL endpoint:
+when it makes sense to return `500` error code for Sage endpoint:
 
 ```php
 <?php
-use GraphQL\GraphQL;
-use GraphQL\Type\Schema;
-use GraphQL\Error\FormattedError;
+use Sage\Sage;
+use Sage\Type\Schema;
+use Sage\Error\FormattedError;
 
 try {
     $schema = new Schema([
         // ...
     ]);
     
-    $body = GraphQL::executeQuery($schema, $query);
+    $body = Sage::executeQuery($schema, $query);
     $status = 200;
 } catch(\Exception $e) {
     $body = [

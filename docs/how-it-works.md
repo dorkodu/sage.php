@@ -1,6 +1,6 @@
 # Overview
 Following reading describes implementation details of query execution process. It may clarify some 
-internals of GraphQL runtime but is not required to use it.
+internals of Sage runtime but is not required to use it.
 
 # Parsing
 
@@ -13,7 +13,7 @@ TODOC
 TODOC
 
 # Errors explained
-There are 3 types of errors in GraphQL:
+There are 3 types of errors in Sage:
 
 - **Syntax**: query has invalid syntax and could not be parsed;
 - **Validation**: query is incompatible with type system (e.g. unknown field is requested);
@@ -25,7 +25,7 @@ the query is not executed.
 Execution process never throws exceptions. Instead, all errors are caught and collected in 
 execution result.
 
-GraphQL is forgiving to **Execution** errors which occur in resolvers of nullable fields. 
+Sage is forgiving to **Execution** errors which occur in resolvers of nullable fields. 
 If such field throws or returns unexpected value the value of the field in response will be simply 
 replaced with **null** and error entry will be registered.
 

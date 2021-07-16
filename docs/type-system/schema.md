@@ -2,12 +2,12 @@
 The schema is a container of your type hierarchy, which accepts root types in a constructor and provides
 methods for receiving information about your types to internal GrahpQL tools.
 
-In **graphql-php** schema is an instance of [`GraphQL\Type\Schema`](../reference.md#graphqltypeschema) 
+In **Sage-php** schema is an instance of [`Sage\Type\Schema`](../reference.md#Sagetypeschema) 
 which accepts configuration array in a constructor:
 
 ```php
 <?php
-use GraphQL\Type\Schema;
+use Sage\Type\Schema;
 
 $schema = new Schema([
     'query' => $queryType, 
@@ -27,8 +27,8 @@ of your API:
 
 ```php
 <?php
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
 
 $queryType = new ObjectType([
     'name' => 'Query',
@@ -79,26 +79,26 @@ Field names of Mutation type are usually verbs and they almost always have argum
 with complex input values (see [Mutations and Input Types](input-types.md) for details).
 
 # Configuration Options
-Schema constructor expects an instance of [`GraphQL\Type\SchemaConfig`](../reference.md#graphqltypeschemaconfig) 
+Schema constructor expects an instance of [`Sage\Type\SchemaConfig`](../reference.md#Sagetypeschemaconfig) 
 or an array with following options:
 
 Option       | Type     | Notes
 ------------ | -------- | -----
 query        | `ObjectType` | **Required.** Object type (usually named "Query") containing root-level fields of your read API
 mutation     | `ObjectType` | Object type (usually named "Mutation") containing root-level fields of your write API
-subscription     | `ObjectType` | Reserved for future subscriptions implementation. Currently presented for compatibility with introspection query of **graphql-js**, used by various clients (like Relay or GraphiQL)
-directives  | `Directive[]` | A full list of [directives](directives.md) supported by your schema. By default, contains built-in **@skip** and **@include** directives.<br><br> If you pass your own directives and still want to use built-in directives - add them explicitly. For example:<br><br> *array_merge(GraphQL::getStandardDirectives(), [$myCustomDirective]);*
-types     | `ObjectType[]` | List of object types which cannot be detected by **graphql-php** during static schema analysis.<br><br>Most often it happens when the object type is never referenced in fields directly but is still a part of a schema because it implements an interface which resolves to this object type in its **resolveType** callable. <br><br> Note that you are not required to pass all of your types here - it is simply a workaround for concrete use-case.
+subscription     | `ObjectType` | Reserved for future subscriptions implementation. Currently presented for compatibility with introspection query of **Sage-js**, used by various clients (like Relay or GraphiQL)
+directives  | `Directive[]` | A full list of [directives](directives.md) supported by your schema. By default, contains built-in **@skip** and **@include** directives.<br><br> If you pass your own directives and still want to use built-in directives - add them explicitly. For example:<br><br> *array_merge(Sage::getStandardDirectives(), [$myCustomDirective]);*
+types     | `ObjectType[]` | List of object types which cannot be detected by **Sage-php** during static schema analysis.<br><br>Most often it happens when the object type is never referenced in fields directly but is still a part of a schema because it implements an interface which resolves to this object type in its **resolveType** callable. <br><br> Note that you are not required to pass all of your types here - it is simply a workaround for concrete use-case.
 typeLoader     | `callable` | **function($name)** Expected to return type instance given the name. Must always return the same instance if called multiple times. See section below on lazy type loading.
 
 # Using config class
 If you prefer fluid interface for config with auto-completion in IDE and static time validation, 
-use [`GraphQL\Type\SchemaConfig`](../reference.md#graphqltypeschemaconfig) instead of an array:
+use [`Sage\Type\SchemaConfig`](../reference.md#Sagetypeschemaconfig) instead of an array:
 
 ```php
 <?php
-use GraphQL\Type\SchemaConfig;
-use GraphQL\Type\Schema;
+use Sage\Type\SchemaConfig;
+use Sage\Type\Schema;
 
 $config = SchemaConfig::create()
     ->setQuery($myQueryType)
@@ -109,7 +109,7 @@ $schema = new Schema($config);
 
 
 # Lazy loading of types
-By default, the schema will scan all of your type, field and argument definitions to serve GraphQL queries. 
+By default, the schema will scan all of your type, field and argument definitions to serve Sage queries. 
 It may cause performance overhead when there are many types in the schema. 
 
 In this case, it is recommended to pass **typeLoader** option to schema constructor and define all 
@@ -121,8 +121,8 @@ always return the same instance of a type.
 Usage example:
 ```php
 <?php
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Schema;
+use Sage\Type\Definition\ObjectType;
+use Sage\Type\Schema;
 
 class Types
 {
@@ -170,7 +170,7 @@ By default, the schema is created with only shallow validation of type and field
 (because validation requires full schema scan and is very costly on bigger schemas).
 
 But there is a special method **assertValid()** on schema instance which throws 
-`GraphQL\Error\InvariantViolation` exception when it encounters any error, like:
+`Sage\Error\InvariantViolation` exception when it encounters any error, like:
 
 - Invalid types used for fields/arguments
 - Missing interface implementations
@@ -184,11 +184,11 @@ Usage example:
 ```php
 <?php
 try {
-    $schema = new GraphQL\Type\Schema([
+    $schema = new Sage\Type\Schema([
         'query' => $myQueryType
     ]);
     $schema->assertValid();
-} catch (GraphQL\Error\InvariantViolation $e) {
+} catch (Sage\Error\InvariantViolation $e) {
     echo $e->getMessage();
 }
 ```

@@ -1,5 +1,5 @@
-# GraphQL\GraphQL
-This is the primary facade for fulfilling GraphQL operations.
+# Sage\Sage
+This is the primary facade for fulfilling Sage operations.
 See [related documentation](executing-queries.md).
 
 **Class Methods:** 
@@ -26,8 +26,8 @@ static function execute(
  * @api
  */
 static function promiseToExecute(
-    GraphQL\Executor\Promise\PromiseAdapter $promiseAdapter,
-    GraphQL\Type\Schema $schema,
+    Sage\Executor\Promise\PromiseAdapter $promiseAdapter,
+    Sage\Type\Schema $schema,
     $source,
     $rootValue = null,
     $context = null,
@@ -35,12 +35,12 @@ static function promiseToExecute(
     string $operationName = null,
     callable $fieldResolver = null,
     array $validationRules = null
-): GraphQL\Executor\Promise\Promise
+): Sage\Executor\Promise\Promise
 ```
 
 ```php
 /**
- * Returns directives defined in GraphQL spec
+ * Returns directives defined in Sage spec
  *
  * @return Directive[]
  *
@@ -51,7 +51,7 @@ static function getStandardDirectives(): array
 
 ```php
 /**
- * Returns types defined in GraphQL spec
+ * Returns types defined in Sage spec
  *
  * @return Type[]
  *
@@ -74,7 +74,7 @@ static function overrideStandardTypes(array $types)
 
 ```php
 /**
- * Returns standard validation rules implementing GraphQL spec
+ * Returns standard validation rules implementing Sage spec
  *
  * @return ValidationRule[]
  *
@@ -91,8 +91,8 @@ static function getStandardValidationRules(): array
  */
 static function setDefaultFieldResolver(callable $fn): void
 ```
-# GraphQL\Type\Definition\Type
-Registry of standard GraphQL types
+# Sage\Type\Definition\Type
+Registry of standard Sage types
 and a base class for all other types.
 
 **Class Methods:** 
@@ -100,42 +100,42 @@ and a base class for all other types.
 /**
  * @api
  */
-static function id(): GraphQL\Type\Definition\ScalarType
+static function id(): Sage\Type\Definition\ScalarType
 ```
 
 ```php
 /**
  * @api
  */
-static function string(): GraphQL\Type\Definition\ScalarType
+static function string(): Sage\Type\Definition\ScalarType
 ```
 
 ```php
 /**
  * @api
  */
-static function boolean(): GraphQL\Type\Definition\ScalarType
+static function boolean(): Sage\Type\Definition\ScalarType
 ```
 
 ```php
 /**
  * @api
  */
-static function int(): GraphQL\Type\Definition\ScalarType
+static function int(): Sage\Type\Definition\ScalarType
 ```
 
 ```php
 /**
  * @api
  */
-static function float(): GraphQL\Type\Definition\ScalarType
+static function float(): Sage\Type\Definition\ScalarType
 ```
 
 ```php
 /**
  * @api
  */
-static function listOf(GraphQL\Type\Definition\Type $wrappedType): GraphQL\Type\Definition\ListOfType
+static function listOf(Sage\Type\Definition\Type $wrappedType): Sage\Type\Definition\ListOfType
 ```
 
 ```php
@@ -144,7 +144,7 @@ static function listOf(GraphQL\Type\Definition\Type $wrappedType): GraphQL\Type\
  *
  * @api
  */
-static function nonNull($wrappedType): GraphQL\Type\Definition\NonNull
+static function nonNull($wrappedType): Sage\Type\Definition\NonNull
 ```
 
 ```php
@@ -162,7 +162,7 @@ static function isInputType($type): bool
  *
  * @api
  */
-static function getNamedType($type): GraphQL\Type\Definition\Type
+static function getNamedType($type): Sage\Type\Definition\Type
 ```
 
 ```php
@@ -205,9 +205,9 @@ static function isAbstractType($type): bool
 /**
  * @api
  */
-static function getNullableType(GraphQL\Type\Definition\Type $type): GraphQL\Type\Definition\Type
+static function getNullableType(Sage\Type\Definition\Type $type): Sage\Type\Definition\Type
 ```
-# GraphQL\Type\Definition\ResolveInfo
+# Sage\Type\Definition\ResolveInfo
 Structure containing information useful for field resolution process.
 
 Passed as 4th argument to every field resolver. See [docs on field resolving (data fetching)](data-fetching.md).
@@ -344,7 +344,7 @@ public $variableValues;
  */
 function getFieldSelection($depth = 0)
 ```
-# GraphQL\Language\DirectiveLocation
+# Sage\Language\DirectiveLocation
 List of available directive locations
 
 **Class Constants:** 
@@ -370,7 +370,7 @@ const INPUT_OBJECT = "INPUT_OBJECT";
 const INPUT_FIELD_DEFINITION = "INPUT_FIELD_DEFINITION";
 ```
 
-# GraphQL\Type\SchemaConfig
+# Sage\Type\SchemaConfig
 Schema configuration class.
 Could be passed directly to schema constructor. List of options accepted by **create** method is
 [described in docs](type-system/schema.md#configuration-options).
@@ -515,25 +515,25 @@ function getTypeLoader()
  */
 function setTypeLoader(callable $typeLoader)
 ```
-# GraphQL\Type\Schema
+# Sage\Type\Schema
 Schema Definition (see [related docs](type-system/schema.md))
 
 A Schema is created by supplying the root types of each type of operation:
 query, mutation (optional) and subscription (optional). A schema definition is
 then supplied to the validator and executor. Usage Example:
 
-    $schema = new GraphQL\Type\Schema([
+    $schema = new Sage\Type\Schema([
       'query' => $MyAppQueryRootType,
       'mutation' => $MyAppMutationRootType,
     ]);
 
 Or using Schema Config instance:
 
-    $config = GraphQL\Type\SchemaConfig::create()
+    $config = Sage\Type\SchemaConfig::create()
         ->setQuery($MyAppQueryRootType)
         ->setMutation($MyAppMutationRootType);
     
-    $schema = new GraphQL\Type\Schema($config);
+    $schema = new Sage\Type\Schema($config);
 
 **Class Methods:** 
 ```php
@@ -578,7 +578,7 @@ function getDirectives()
  *
  * @api
  */
-function getQueryType(): GraphQL\Type\Definition\Type
+function getQueryType(): Sage\Type\Definition\Type
 ```
 
 ```php
@@ -589,7 +589,7 @@ function getQueryType(): GraphQL\Type\Definition\Type
  *
  * @api
  */
-function getMutationType(): GraphQL\Type\Definition\Type
+function getMutationType(): Sage\Type\Definition\Type
 ```
 
 ```php
@@ -600,7 +600,7 @@ function getMutationType(): GraphQL\Type\Definition\Type
  *
  * @api
  */
-function getSubscriptionType(): GraphQL\Type\Definition\Type
+function getSubscriptionType(): Sage\Type\Definition\Type
 ```
 
 ```php
@@ -618,7 +618,7 @@ function getConfig()
  *
  * @api
  */
-function getType(string $name): GraphQL\Type\Definition\Type
+function getType(string $name): Sage\Type\Definition\Type
 ```
 
 ```php
@@ -634,7 +634,7 @@ function getType(string $name): GraphQL\Type\Definition\Type
  *
  * @api
  */
-function getPossibleTypes(GraphQL\Type\Definition\Type $abstractType): array
+function getPossibleTypes(Sage\Type\Definition\Type $abstractType): array
 ```
 
 ```php
@@ -645,8 +645,8 @@ function getPossibleTypes(GraphQL\Type\Definition\Type $abstractType): array
  * @api
  */
 function isPossibleType(
-    GraphQL\Type\Definition\AbstractType $abstractType,
-    GraphQL\Type\Definition\ObjectType $possibleType
+    Sage\Type\Definition\AbstractType $abstractType,
+    Sage\Type\Definition\ObjectType $possibleType
 ): bool
 ```
 
@@ -656,7 +656,7 @@ function isPossibleType(
  *
  * @api
  */
-function getDirective(string $name): GraphQL\Type\Definition\Directive
+function getDirective(string $name): Sage\Type\Definition\Directive
 ```
 
 ```php
@@ -684,8 +684,8 @@ function assertValid()
  */
 function validate()
 ```
-# GraphQL\Language\Parser
-Parses string containing GraphQL query or [type definition](type-system/type-language.md) to Abstract Syntax Tree.
+# Sage\Language\Parser
+Parses string containing Sage query or [type definition](type-system/type-language.md) to Abstract Syntax Tree.
 
 Those magic functions allow partial parsing:
 
@@ -726,8 +726,8 @@ Those magic functions allow partial parsing:
 **Class Methods:** 
 ```php
 /**
- * Given a GraphQL source, parses it into a `GraphQL\Language\AST\DocumentNode`.
- * Throws `GraphQL\Error\SyntaxError` if a syntax error is encountered.
+ * Given a Sage source, parses it into a `Sage\Language\AST\DocumentNode`.
+ * Throws `Sage\Error\SyntaxError` if a syntax error is encountered.
  *
  * Available options:
  *
@@ -780,14 +780,14 @@ static function parse($source, array $options = [])
 
 ```php
 /**
- * Given a string containing a GraphQL value (ex. `[42]`), parse the AST for
+ * Given a string containing a Sage value (ex. `[42]`), parse the AST for
  * that value.
- * Throws `GraphQL\Error\SyntaxError` if a syntax error is encountered.
+ * Throws `Sage\Error\SyntaxError` if a syntax error is encountered.
  *
- * This is useful within tools that operate upon GraphQL Values directly and
- * in isolation of complete GraphQL documents.
+ * This is useful within tools that operate upon Sage Values directly and
+ * in isolation of complete Sage documents.
  *
- * Consider providing the results to the utility function: `GraphQL\Utils\AST::valueFromAST()`.
+ * Consider providing the results to the utility function: `Sage\Utils\AST::valueFromAST()`.
  *
  * @param Source|string $source
  * @param bool[]        $options
@@ -801,14 +801,14 @@ static function parseValue($source, array $options = [])
 
 ```php
 /**
- * Given a string containing a GraphQL Type (ex. `[Int!]`), parse the AST for
+ * Given a string containing a Sage Type (ex. `[Int!]`), parse the AST for
  * that type.
- * Throws `GraphQL\Error\SyntaxError` if a syntax error is encountered.
+ * Throws `Sage\Error\SyntaxError` if a syntax error is encountered.
  *
- * This is useful within tools that operate upon GraphQL Types directly and
- * in isolation of complete GraphQL documents.
+ * This is useful within tools that operate upon Sage Types directly and
+ * in isolation of complete Sage documents.
  *
- * Consider providing the results to the utility function: `GraphQL\Utils\AST::typeFromAST()`.
+ * Consider providing the results to the utility function: `Sage\Utils\AST::typeFromAST()`.
  *
  * @param Source|string $source
  * @param bool[]        $options
@@ -819,22 +819,22 @@ static function parseValue($source, array $options = [])
  */
 static function parseType($source, array $options = [])
 ```
-# GraphQL\Language\Printer
-Prints AST to string. Capable of printing GraphQL queries and Type definition language.
+# Sage\Language\Printer
+Prints AST to string. Capable of printing Sage queries and Type definition language.
 Useful for pretty-printing queries or printing back AST for logging, documentation, etc.
 
 Usage example:
 
 ```php
 $query = 'query myQuery {someField}';
-$ast = GraphQL\Language\Parser::parse($query);
-$printed = GraphQL\Language\Printer::doPrint($ast);
+$ast = Sage\Language\Parser::parse($query);
+$printed = Sage\Language\Printer::doPrint($ast);
 ```
 
 **Class Methods:** 
 ```php
 /**
- * Prints AST to string. Capable of printing GraphQL queries and Type definition language.
+ * Prints AST to string. Capable of printing Sage queries and Type definition language.
  *
  * @param Node $ast
  *
@@ -844,7 +844,7 @@ $printed = GraphQL\Language\Printer::doPrint($ast);
  */
 static function doPrint($ast)
 ```
-# GraphQL\Language\Visitor
+# Sage\Language\Visitor
 Utility for efficient AST traversal and modification.
 
 `visit()` will walk through an AST using a depth first traversal, calling
@@ -879,7 +879,7 @@ visit function.
     ]);
 
 Alternatively to providing enter() and leave() functions, a visitor can
-instead provide functions named the same as the [kinds of AST nodes](reference.md#graphqllanguageastnodekind),
+instead provide functions named the same as the [kinds of AST nodes](reference.md#Sagelanguageastnodekind),
 or enter/leave visitors at a named key, leading to four permutations of
 visitor API:
 
@@ -981,7 +981,7 @@ static function skipNode()
  */
 static function removeNode()
 ```
-# GraphQL\Language\AST\NodeKind
+# Sage\Language\AST\NodeKind
 
 
 **Class Constants:** 
@@ -1031,8 +1031,8 @@ const DIRECTIVE_DEFINITION = "DirectiveDefinition";
 const SCHEMA_EXTENSION = "SchemaExtension";
 ```
 
-# GraphQL\Executor\Executor
-Implements the "Evaluating requests" section of the GraphQL specification.
+# Sage\Executor\Executor
+Implements the "Evaluating requests" section of the Sage specification.
 
 **Class Methods:** 
 ```php
@@ -1052,8 +1052,8 @@ Implements the "Evaluating requests" section of the GraphQL specification.
  * @api
  */
 static function execute(
-    GraphQL\Type\Schema $schema,
-    GraphQL\Language\AST\DocumentNode $documentNode,
+    Sage\Type\Schema $schema,
+    Sage\Language\AST\DocumentNode $documentNode,
     $rootValue = null,
     $contextValue = null,
     $variableValues = null,
@@ -1079,9 +1079,9 @@ static function execute(
  * @api
  */
 static function promiseToExecute(
-    GraphQL\Executor\Promise\PromiseAdapter $promiseAdapter,
-    GraphQL\Type\Schema $schema,
-    GraphQL\Language\AST\DocumentNode $documentNode,
+    Sage\Executor\Promise\PromiseAdapter $promiseAdapter,
+    Sage\Type\Schema $schema,
+    Sage\Language\AST\DocumentNode $documentNode,
     $rootValue = null,
     $contextValue = null,
     $variableValues = null,
@@ -1089,12 +1089,12 @@ static function promiseToExecute(
     callable $fieldResolver = null
 )
 ```
-# GraphQL\Executor\ExecutionResult
+# Sage\Executor\ExecutionResult
 Returned after [query execution](executing-queries.md).
 Represents both - result of successful execution and of a failed one
 (with errors collected in `errors` prop)
 
-Could be converted to [spec-compliant](https://facebook.github.io/graphql/#sec-Response-Format)
+Could be converted to [spec-compliant](https://facebook.github.io/Sage/#sec-Response-Format)
 serializable array using `toArray()`
 
 **Class Props:** 
@@ -1131,11 +1131,11 @@ public $extensions;
 **Class Methods:** 
 ```php
 /**
- * Define custom error formatting (must conform to http://facebook.github.io/graphql/#sec-Errors)
+ * Define custom error formatting (must conform to http://facebook.github.io/Sage/#sec-Errors)
  *
- * Expected signature is: function (GraphQL\Error\Error $error): array
+ * Expected signature is: function (Sage\Error\Error $error): array
  *
- * Default formatter is "GraphQL\Error\FormattedError::createFromException"
+ * Default formatter is "Sage\Error\FormattedError::createFromException"
  *
  * Expected returned value must be an array:
  * array(
@@ -1170,21 +1170,21 @@ function setErrorsHandler(callable $handler)
 
 ```php
 /**
- * Converts GraphQL query result to spec-compliant serializable array using provided
+ * Converts Sage query result to spec-compliant serializable array using provided
  * errors handler and formatter.
  *
  * If debug argument is passed, output of error formatter is enriched which debugging information
  * ("debugMessage", "trace" keys depending on flags).
  *
- * $debug argument must sum of flags from @see \GraphQL\Error\DebugFlag
+ * $debug argument must sum of flags from @see \Sage\Error\DebugFlag
  *
  * @return mixed[]
  *
  * @api
  */
-function toArray(int $debug = "GraphQL\Error\DebugFlag::NONE"): array
+function toArray(int $debug = "Sage\Error\DebugFlag::NONE"): array
 ```
-# GraphQL\Executor\Promise\PromiseAdapter
+# Sage\Executor\Promise\PromiseAdapter
 Provides a means for integration of async PHP platforms ([related docs](data-fetching.md#async-php))
 
 **Interface Methods:** 
@@ -1203,7 +1203,7 @@ function isThenable($value)
 
 ```php
 /**
- * Converts thenable of the underlying platform into GraphQL\Executor\Promise\Promise instance
+ * Converts thenable of the underlying platform into Sage\Executor\Promise\Promise instance
  *
  * @param object $thenable
  *
@@ -1217,14 +1217,14 @@ function convertThenable($thenable)
 ```php
 /**
  * Accepts our Promise wrapper, extracts adopted promise out of it and executes actual `then` logic described
- * in Promises/A+ specs. Then returns new wrapped instance of GraphQL\Executor\Promise\Promise.
+ * in Promises/A+ specs. Then returns new wrapped instance of Sage\Executor\Promise\Promise.
  *
  * @return Promise
  *
  * @api
  */
 function then(
-    GraphQL\Executor\Promise\Promise $promise,
+    Sage\Executor\Promise\Promise $promise,
     callable $onFulfilled = null,
     callable $onRejected = null
 )
@@ -1284,19 +1284,19 @@ function createRejected($reason)
  */
 function all(array $promisesOrValues)
 ```
-# GraphQL\Validator\DocumentValidator
+# Sage\Validator\DocumentValidator
 Implements the "Validation" section of the spec.
 
 Validation runs synchronously, returning an array of encountered errors, or
 an empty array if no errors were encountered and the document is valid.
 
 A list of specific validation rules may be provided. If not provided, the
-default list of rules defined by the GraphQL specification will be used.
+default list of rules defined by the Sage specification will be used.
 
-Each validation rule is an instance of GraphQL\Validator\Rules\ValidationRule
-which returns a visitor (see the [GraphQL\Language\Visitor API](reference.md#graphqllanguagevisitor)).
+Each validation rule is an instance of Sage\Validator\Rules\ValidationRule
+which returns a visitor (see the [Sage\Language\Visitor API](reference.md#Sagelanguagevisitor)).
 
-Visitor methods are expected to return an instance of [GraphQL\Error\Error](reference.md#graphqlerrorerror),
+Visitor methods are expected to return an instance of [Sage\Error\Error](reference.md#Sageerrorerror),
 or array of such instances when invalid.
 
 Optionally a custom TypeInfo instance may be provided. If not provided, one
@@ -1314,10 +1314,10 @@ will be created from the provided schema.
  * @api
  */
 static function validate(
-    GraphQL\Type\Schema $schema,
-    GraphQL\Language\AST\DocumentNode $ast,
+    Sage\Type\Schema $schema,
+    Sage\Language\AST\DocumentNode $ast,
     array $rules = null,
-    GraphQL\Utils\TypeInfo $typeInfo = null
+    Sage\Utils\TypeInfo $typeInfo = null
 )
 ```
 
@@ -1337,7 +1337,7 @@ static function allRules()
  * Returns global validation rule by name. Standard rules are named by class name, so
  * example usage for such rules:
  *
- * $rule = DocumentValidator::getRule(GraphQL\Validator\Rules\QueryComplexity::class);
+ * $rule = DocumentValidator::getRule(Sage\Validator\Rules\QueryComplexity::class);
  *
  * @param string $name
  *
@@ -1354,13 +1354,13 @@ static function getRule($name)
  *
  * @api
  */
-static function addRule(GraphQL\Validator\Rules\ValidationRule $rule)
+static function addRule(Sage\Validator\Rules\ValidationRule $rule)
 ```
-# GraphQL\Error\Error
+# Sage\Error\Error
 Describes an Error found during the parse, validate, or
-execute phases of performing a GraphQL operation. In addition to a message
+execute phases of performing a Sage operation. In addition to a message
 and stack trace, it also includes information about the locations in a
-GraphQL document and/or execution result that correspond to the Error.
+Sage document and/or execution result that correspond to the Error.
 
 When the error was caused by an exception thrown in resolver, original exception
 is available via `getPrevious()`.
@@ -1372,16 +1372,16 @@ are available in addition to those listed below.
 
 **Class Constants:** 
 ```php
-const CATEGORY_GRAPHQL = "graphql";
+const CATEGORY_Sage = "Sage";
 const CATEGORY_INTERNAL = "internal";
 ```
 
 **Class Methods:** 
 ```php
 /**
- * An array of locations within the source GraphQL document which correspond to this error.
+ * An array of locations within the source Sage document which correspond to this error.
  *
- * Each entry has information about `line` and `column` within source GraphQL document:
+ * Each entry has information about `line` and `column` within source Sage document:
  * $location->line;
  * $location->column;
  *
@@ -1407,7 +1407,7 @@ function getLocations()
  */
 function getPath()
 ```
-# GraphQL\Error\Warning
+# Sage\Error\Warning
 Encapsulates warnings produced by the library.
 
 Warnings can be suppressed (individually or all) if required.
@@ -1465,7 +1465,7 @@ static function suppress($suppress = true): void
  */
 static function enable($enable = true): void
 ```
-# GraphQL\Error\ClientAware
+# Sage\Error\ClientAware
 This interface is used for [default error formatting](error-handling.md).
 
 Only errors implementing this interface (and returning true from `isClientSafe()`)
@@ -1489,7 +1489,7 @@ function isClientSafe()
 /**
  * Returns string describing a category of the error.
  *
- * Value "graphql" is reserved for errors produced by query parsing or validation, do not use it.
+ * Value "Sage" is reserved for errors produced by query parsing or validation, do not use it.
  *
  * @return string
  *
@@ -1497,7 +1497,7 @@ function isClientSafe()
  */
 function getCategory()
 ```
-# GraphQL\Error\DebugFlag
+# Sage\Error\DebugFlag
 Collection of flags for [error debugging](error-handling.md#debugging-tools).
 
 **Class Constants:** 
@@ -1509,9 +1509,9 @@ const RETHROW_INTERNAL_EXCEPTIONS = 4;
 const RETHROW_UNSAFE_EXCEPTIONS = 8;
 ```
 
-# GraphQL\Error\FormattedError
+# Sage\Error\FormattedError
 This class is used for [default error formatting](error-handling.md).
-It converts PHP exceptions to [spec-compliant errors](https://facebook.github.io/graphql/#sec-Errors)
+It converts PHP exceptions to [spec-compliant errors](https://facebook.github.io/Sage/#sec-Errors)
 and provides tools for error debugging.
 
 **Class Methods:** 
@@ -1529,13 +1529,13 @@ static function setInternalErrorMessage($msg)
 
 ```php
 /**
- * Standard GraphQL error formatter. Converts any exception to array
- * conforming to GraphQL spec.
+ * Standard Sage error formatter. Converts any exception to array
+ * conforming to Sage spec.
  *
  * This method only exposes exception message when exception implements ClientAware interface
  * (or when debug flags are passed).
  *
- * For a list of available debug flags @see \GraphQL\Error\DebugFlag constants.
+ * For a list of available debug flags @see \Sage\Error\DebugFlag constants.
  *
  * @param string $internalErrorMessage
  *
@@ -1547,7 +1547,7 @@ static function setInternalErrorMessage($msg)
  */
 static function createFromException(
     Throwable $exception,
-    int $debug = "GraphQL\Error\DebugFlag::NONE",
+    int $debug = "Sage\Error\DebugFlag::NONE",
     $internalErrorMessage = null
 ): array
 ```
@@ -1564,9 +1564,9 @@ static function createFromException(
  */
 static function toSafeTrace($error)
 ```
-# GraphQL\Server\StandardServer
-GraphQL server compatible with both: [express-graphql](https://github.com/graphql/express-graphql)
-and [Apollo Server](https://github.com/apollographql/graphql-server).
+# Sage\Server\StandardServer
+Sage server compatible with both: [express-Sage](https://github.com/Sage/express-Sage)
+and [Apollo Server](https://github.com/apolloSage/Sage-server).
 Usage Example:
 
     $server = new StandardServer([
@@ -1574,13 +1574,13 @@ Usage Example:
     ]);
     $server->handleRequest();
 
-Or using [ServerConfig](reference.md#graphqlserverserverconfig) instance:
+Or using [ServerConfig](reference.md#Sageserverserverconfig) instance:
 
-    $config = GraphQL\Server\ServerConfig::create()
+    $config = Sage\Server\ServerConfig::create()
         ->setSchema($mySchema)
         ->setContext($myContext);
     
-    $server = new GraphQL\Server\StandardServer($config);
+    $server = new Sage\Server\StandardServer($config);
     $server->handleRequest();
 
 See [dedicated section in docs](executing-queries.md#using-server) for details.
@@ -1603,7 +1603,7 @@ static function send500Error($error, $debug = false, $exitWhenDone = false)
 
 ```php
 /**
- * Creates new instance of a standard GraphQL HTTP server
+ * Creates new instance of a standard Sage HTTP server
  *
  * @param ServerConfig|mixed[] $config
  *
@@ -1633,7 +1633,7 @@ function handleRequest($parsedBody = null, $exitWhenDone = false)
 
 ```php
 /**
- * Executes GraphQL operation and returns execution result
+ * Executes Sage operation and returns execution result
  * (or promise when promise adapter is different from SyncPromiseAdapter).
  *
  * By default (when $parsedBody is not set) it uses PHP globals to parse a request.
@@ -1673,7 +1673,7 @@ function processPsrRequest(
 
 ```php
 /**
- * Executes GraphQL operation and returns execution result
+ * Executes Sage operation and returns execution result
  * (or promise when promise adapter is different from SyncPromiseAdapter)
  *
  * @return ExecutionResult|ExecutionResult[]|Promise
@@ -1694,18 +1694,18 @@ function executePsrRequest(Psr\Http\Message\RequestInterface $request)
  */
 function getHelper()
 ```
-# GraphQL\Server\ServerConfig
+# Sage\Server\ServerConfig
 Server configuration class.
 Could be passed directly to server constructor. List of options accepted by **create** method is
 [described in docs](executing-queries.md#server-configuration-options).
 
 Usage example:
 
-    $config = GraphQL\Server\ServerConfig::create()
+    $config = Sage\Server\ServerConfig::create()
         ->setSchema($mySchema)
         ->setContext($myContext);
     
-    $server = new GraphQL\Server\StandardServer($config);
+    $server = new Sage\Server\StandardServer($config);
 
 **Class Methods:** 
 ```php
@@ -1728,7 +1728,7 @@ static function create(array $config = [])
  *
  * @api
  */
-function setSchema(GraphQL\Type\Schema $schema)
+function setSchema(Sage\Type\Schema $schema)
 ```
 
 ```php
@@ -1812,11 +1812,11 @@ function setPersistentQueryLoader(callable $persistentQueryLoader)
 
 ```php
 /**
- * Set response debug flags. @see \GraphQL\Error\DebugFlag class for a list of all available flags
+ * Set response debug flags. @see \Sage\Error\DebugFlag class for a list of all available flags
  *
  * @api
  */
-function setDebugFlag(int $debugFlag = "GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE"): self
+function setDebugFlag(int $debugFlag = "Sage\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE"): self
 ```
 
 ```php
@@ -1834,15 +1834,15 @@ function setQueryBatching(bool $enableBatching): self
  *
  * @api
  */
-function setPromiseAdapter(GraphQL\Executor\Promise\PromiseAdapter $promiseAdapter)
+function setPromiseAdapter(Sage\Executor\Promise\PromiseAdapter $promiseAdapter)
 ```
-# GraphQL\Server\Helper
+# Sage\Server\Helper
 Contains functionality that could be re-used by various server implementations
 
 **Class Methods:** 
 ```php
 /**
- * Parses HTTP request using PHP globals and returns GraphQL OperationParams
+ * Parses HTTP request using PHP globals and returns Sage OperationParams
  * contained in this request. For batched requests it returns an array of OperationParams.
  *
  * This function does not check validity of these params
@@ -1894,24 +1894,24 @@ function parseRequestParams($method, array $bodyParams, array $queryParams)
  *
  * @api
  */
-function validateOperationParams(GraphQL\Server\OperationParams $params)
+function validateOperationParams(Sage\Server\OperationParams $params)
 ```
 
 ```php
 /**
- * Executes GraphQL operation with given server configuration and returns execution result
+ * Executes Sage operation with given server configuration and returns execution result
  * (or promise when promise adapter is different from SyncPromiseAdapter)
  *
  * @return ExecutionResult|Promise
  *
  * @api
  */
-function executeOperation(GraphQL\Server\ServerConfig $config, GraphQL\Server\OperationParams $op)
+function executeOperation(Sage\Server\ServerConfig $config, Sage\Server\OperationParams $op)
 ```
 
 ```php
 /**
- * Executes batched GraphQL operations with shared promise queue
+ * Executes batched Sage operations with shared promise queue
  * (thus, effectively batching deferreds|promises of all queries at once)
  *
  * @param OperationParams[] $operations
@@ -1920,7 +1920,7 @@ function executeOperation(GraphQL\Server\ServerConfig $config, GraphQL\Server\Op
  *
  * @api
  */
-function executeBatch(GraphQL\Server\ServerConfig $config, array $operations)
+function executeBatch(Sage\Server\ServerConfig $config, array $operations)
 ```
 
 ```php
@@ -1964,8 +1964,8 @@ function toPsrResponse(
     Psr\Http\Message\StreamInterface $writableBodyStream
 )
 ```
-# GraphQL\Server\OperationParams
-Structure representing parsed HTTP parameters for GraphQL operation
+# Sage\Server\OperationParams
+Structure representing parsed HTTP parameters for Sage operation
 
 **Class Props:** 
 ```php
@@ -2016,7 +2016,7 @@ public $extensions;
  *
  * @api
  */
-static function create(array $params, bool $readonly = false): GraphQL\Server\OperationParams
+static function create(array $params, bool $readonly = false): Sage\Server\OperationParams
 ```
 
 ```php
@@ -2041,14 +2041,14 @@ function getOriginalInput($key)
  */
 function isReadOnly()
 ```
-# GraphQL\Utils\BuildSchema
-Build instance of `GraphQL\Type\Schema` out of type language definition (string or parsed AST)
+# Sage\Utils\BuildSchema
+Build instance of `Sage\Type\Schema` out of type language definition (string or parsed AST)
 See [section in docs](type-system/type-language.md) for details.
 
 **Class Methods:** 
 ```php
 /**
- * A helper function to build a GraphQLSchema directly from a source
+ * A helper function to build a SageSchema directly from a source
  * document.
  *
  * @param DocumentNode|Source|string $source
@@ -2064,12 +2064,12 @@ static function build($source, callable $typeConfigDecorator = null, array $opti
 ```php
 /**
  * This takes the ast of a schema document produced by the parse function in
- * GraphQL\Language\Parser.
+ * Sage\Language\Parser.
  *
  * If no schema definition is provided, then it will look for types named Query
  * and Mutation.
  *
- * Given that AST it constructs a GraphQL\Type\Schema. The resulting schema
+ * Given that AST it constructs a Sage\Type\Schema. The resulting schema
  * has no resolve methods, so execution will use default resolvers.
  *
  * Accepts options as a third argument:
@@ -2087,18 +2087,18 @@ static function build($source, callable $typeConfigDecorator = null, array $opti
  * @api
  */
 static function buildAST(
-    GraphQL\Language\AST\DocumentNode $ast,
+    Sage\Language\AST\DocumentNode $ast,
     callable $typeConfigDecorator = null,
     array $options = []
 )
 ```
-# GraphQL\Utils\AST
+# Sage\Utils\AST
 Various utilities dealing with AST
 
 **Class Methods:** 
 ```php
 /**
- * Convert representation of AST as an associative array to instance of GraphQL\Language\AST\Node.
+ * Convert representation of AST as an associative array to instance of Sage\Language\AST\Node.
  *
  * For example:
  *
@@ -2122,7 +2122,7 @@ Various utilities dealing with AST
  *
  * @api
  */
-static function fromArray(array $node): GraphQL\Language\AST\Node
+static function fromArray(array $node): Sage\Language\AST\Node
 ```
 
 ```php
@@ -2133,17 +2133,17 @@ static function fromArray(array $node): GraphQL\Language\AST\Node
  *
  * @api
  */
-static function toArray(GraphQL\Language\AST\Node $node): array
+static function toArray(Sage\Language\AST\Node $node): array
 ```
 
 ```php
 /**
- * Produces a GraphQL Value AST given a PHP value.
+ * Produces a Sage Value AST given a PHP value.
  *
- * Optionally, a GraphQL type may be provided, which will be used to
+ * Optionally, a Sage type may be provided, which will be used to
  * disambiguate between value primitives.
  *
- * | PHP Value     | GraphQL Value        |
+ * | PHP Value     | Sage Value        |
  * | ------------- | -------------------- |
  * | Object        | Input Object         |
  * | Assoc Array   | Input Object         |
@@ -2161,20 +2161,20 @@ static function toArray(GraphQL\Language\AST\Node $node): array
  *
  * @api
  */
-static function astFromValue($value, GraphQL\Type\Definition\InputType $type)
+static function astFromValue($value, Sage\Type\Definition\InputType $type)
 ```
 
 ```php
 /**
- * Produces a PHP value given a GraphQL Value AST.
+ * Produces a PHP value given a Sage Value AST.
  *
- * A GraphQL type must be provided, which will be used to interpret different
- * GraphQL Value literals.
+ * A Sage type must be provided, which will be used to interpret different
+ * Sage Value literals.
  *
  * Returns `null` when the value could not be validly coerced according to
  * the provided type.
  *
- * | GraphQL Value        | PHP Value     |
+ * | Sage Value        | PHP Value     |
  * | -------------------- | ------------- |
  * | Input Object         | Assoc Array   |
  * | List                 | Array         |
@@ -2194,20 +2194,20 @@ static function astFromValue($value, GraphQL\Type\Definition\InputType $type)
  * @api
  */
 static function valueFromAST(
-    GraphQL\Language\AST\ValueNode $valueNode,
-    GraphQL\Type\Definition\Type $type,
+    Sage\Language\AST\ValueNode $valueNode,
+    Sage\Type\Definition\Type $type,
     array $variables = null
 )
 ```
 
 ```php
 /**
- * Produces a PHP value given a GraphQL Value AST.
+ * Produces a PHP value given a Sage Value AST.
  *
  * Unlike `valueFromAST()`, no type is provided. The resulting PHP value
- * will reflect the provided GraphQL value AST.
+ * will reflect the provided Sage value AST.
  *
- * | GraphQL Value        | PHP Value     |
+ * | Sage Value        | PHP Value     |
  * | -------------------- | ------------- |
  * | Input Object         | Assoc Array   |
  * | List                 | Array         |
@@ -2241,7 +2241,7 @@ static function valueFromASTUntyped($valueNode, array $variables = null)
  *
  * @api
  */
-static function typeFromAST(GraphQL\Type\Schema $schema, $inputTypeNode)
+static function typeFromAST(Sage\Type\Schema $schema, $inputTypeNode)
 ```
 
 ```php
@@ -2254,12 +2254,12 @@ static function typeFromAST(GraphQL\Type\Schema $schema, $inputTypeNode)
  *
  * @api
  */
-static function getOperation(GraphQL\Language\AST\DocumentNode $document, $operationName = null)
+static function getOperation(Sage\Language\AST\DocumentNode $document, $operationName = null)
 ```
-# GraphQL\Utils\SchemaPrinter
-Given an instance of Schema, prints it in GraphQL type language.
+# Sage\Utils\SchemaPrinter
+Given an instance of Schema, prints it in Sage type language.
 
-**Class Methods:** 
+**Class Methods:**
 ```php
 /**
  * @param array<string, bool> $options
@@ -2270,7 +2270,7 @@ Given an instance of Schema, prints it in GraphQL type language.
  *
  * @api
  */
-static function doPrint(GraphQL\Type\Schema $schema, array $options = []): string
+static function doPrint(Sage\Type\Schema $schema, array $options = []): string
 ```
 
 ```php
@@ -2279,5 +2279,5 @@ static function doPrint(GraphQL\Type\Schema $schema, array $options = []): strin
  *
  * @api
  */
-static function printIntrospectionSchema(GraphQL\Type\Schema $schema, array $options = []): string
+static function printIntrospectionSchema(Sage\Type\Schema $schema, array $options = []): string
 ```

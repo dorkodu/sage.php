@@ -1,12 +1,12 @@
-[![GitHub stars](https://img.shields.io/github/stars/webonyx/graphql-php.svg?style=social&label=Star)](https://github.com/webonyx/graphql-php)
-[![Build Status](https://travis-ci.org/webonyx/graphql-php.svg?branch=master)](https://travis-ci.org/webonyx/graphql-php)
-[![Coverage Status](https://coveralls.io/repos/github/webonyx/graphql-php/badge.svg)](https://coveralls.io/github/webonyx/graphql-php)
-[![Latest Stable Version](https://poser.pugx.org/webonyx/graphql-php/version)](https://packagist.org/packages/webonyx/graphql-php)
-[![License](https://poser.pugx.org/webonyx/graphql-php/license)](https://packagist.org/packages/webonyx/graphql-php)
+[![GitHub stars](https://img.shields.io/github/stars/webonyx/Sage-php.svg?style=social&label=Star)](https://github.com/webonyx/Sage-php)
+[![Build Status](https://travis-ci.org/webonyx/Sage-php.svg?branch=master)](https://travis-ci.org/webonyx/Sage-php)
+[![Coverage Status](https://coveralls.io/repos/github/webonyx/Sage-php/badge.svg)](https://coveralls.io/github/webonyx/Sage-php)
+[![Latest Stable Version](https://poser.pugx.org/webonyx/Sage-php/version)](https://packagist.org/packages/webonyx/Sage-php)
+[![License](https://poser.pugx.org/webonyx/Sage-php/license)](https://packagist.org/packages/webonyx/Sage-php)
 
 # Documentation — Sage.php
 
-Sage is a simple, modern way to build APIs consumed by the web and mobile clients. It is intended to be an alternative to GraphQL, REST and SOAP.
+Sage is a simple, modern way to build APIs consumed by the web and mobile clients. It is intended to be an alternative to Sage, REST and SOAP.
 
 Sage itself is a [protocol](https://github.com/dorkodu/sage) designed by [Dorkodu](https://dorkodu.com).
 

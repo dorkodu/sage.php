@@ -1,10 +1,10 @@
 # Built-in Scalar Types
-GraphQL specification describes several built-in scalar types. In **graphql-php** they are 
-exposed as static methods of [`GraphQL\Type\Definition\Type`](../reference.md#graphqltypedefinitiontype) class:
+Sage specification describes several built-in scalar types. In **Sage-php** they are 
+exposed as static methods of [`Sage\Type\Definition\Type`](../reference.md#Sagetypedefinitiontype) class:
 
 ```php
 <?php
-use GraphQL\Type\Definition\Type;
+use Sage\Type\Definition\Type;
 
 // Built-in Scalar types:
 Type::string();  // String type
@@ -13,7 +13,7 @@ Type::float();   // Float type
 Type::boolean(); // Boolean type
 Type::id();      // ID type
 ```
-Those methods return instances of `GraphQL\Type\Definition\ScalarType` (actually one of subclasses).
+Those methods return instances of `Sage\Type\Definition\ScalarType` (actually one of subclasses).
 Use them directly in type definitions, or wrap in your [TypeRegistry](index.md#type-registry) 
 (if you use one).
 
@@ -21,16 +21,16 @@ Use them directly in type definitions, or wrap in your [TypeRegistry](index.md#t
 In addition to built-in scalars, you can define your own scalar types with additional validation. 
 Typical examples of such types are **Email**, **Date**, **Url**, etc.
 
-In order to implement your own type, you must understand how scalars are presented in GraphQL.
-GraphQL deals with scalars in following cases:
+In order to implement your own type, you must understand how scalars are presented in Sage.
+Sage deals with scalars in following cases:
 
 1. When converting **internal representation** of value returned by your app (e.g. stored in a database 
 or hardcoded in the source code) to **serialized** representation included in the response.
  
-2. When converting **input value** passed by a client in variables along with GraphQL query to 
+2. When converting **input value** passed by a client in variables along with Sage query to 
 **internal representation** of your app.
 
-3. When converting **input literal value** hardcoded in GraphQL query (e.g. field argument value) to 
+3. When converting **input literal value** hardcoded in Sage query (e.g. field argument value) to 
 the **internal representation** of your app.
 
 Those cases are covered by methods `serialize`, `parseValue` and `parseLiteral` of abstract `ScalarType` 
@@ -42,11 +42,11 @@ Here is an example of a simple **Email** type:
 <?php
 namespace MyApp;
 
-use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
+use Sage\Error\Error;
+use Sage\Error\InvariantViolation;
+use Sage\Language\AST\StringValueNode;
+use Sage\Type\Definition\ScalarType;
+use Sage\Utils\Utils;
 
 class EmailType extends ScalarType
 {
@@ -88,21 +88,21 @@ class EmailType extends ScalarType
     }
 
     /**
-     * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
+     * Parses an externally provided literal value (hardcoded in Sage query) to use as an input.
      * 
      * E.g. 
      * {
      *   user(email: "user@example.com") 
      * }
      *
-     * @param \GraphQL\Language\AST\Node $valueNode
+     * @param \Sage\Language\AST\Node $valueNode
      * @param array|null $variables
      * @return string
      * @throws Error
      */
     public function parseLiteral(Node $valueNode, ?array $variables = null)
     {
-        // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
+        // Note: throwing Sage\Error\Error vs \UnexpectedValueException to benefit from Sage
         // error location in query:
         if (!$valueNode instanceof StringValueNode) {
             throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, [$valueNode]);
@@ -119,7 +119,7 @@ Or with inline style:
 
 ```php
 <?php
-use GraphQL\Type\Definition\CustomScalarType;
+use Sage\Type\Definition\CustomScalarType;
 
 $emailType = new CustomScalarType([
     'name' => 'Email',

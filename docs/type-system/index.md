@@ -1,8 +1,8 @@
 # Type System
-To start using GraphQL you are expected to implement a type hierarchy and expose it as [Schema](schema.md). 
+To start using Sage you are expected to implement a type hierarchy and expose it as [Schema](schema.md). 
 
-In graphql-php **type** is an instance of internal class from 
-`GraphQL\Type\Definition` namespace: [`ObjectType`](object-types.md), 
+In Sage-php **type** is an instance of internal class from 
+`Sage\Type\Definition` namespace: [`ObjectType`](object-types.md), 
 [`InterfaceType`](interfaces.md), [`UnionType`](unions.md), [`InputObjectType`](input-types.md), 
 [`ScalarType`](scalar-types.md), [`EnumType`](enum-types.md) (or one of subclasses).
 
@@ -16,8 +16,8 @@ Inline definitions:
 <?php
 namespace MyApp;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
 
 $myType = new ObjectType([
     'name' => 'MyType',
@@ -32,8 +32,8 @@ Class per type:
 <?php
 namespace MyApp;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
 
 class MyType extends ObjectType
 {
@@ -51,9 +51,9 @@ class MyType extends ObjectType
 }
 ```
 
-Using [GraphQL Type language](http://graphql.org/learn/schema/#type-language):
+Using [Sage Type language](http://Sage.org/learn/schema/#type-language):
 
-```graphql
+```Sage
 schema {
     query: Query
     mutation: Mutation
@@ -72,7 +72,7 @@ input HelloInput {
 Read more about type language definitions in a [dedicated docs section](type-language.md).
 
 # Type Registry
-Every type must be presented in Schema by a single instance (**graphql-php** 
+Every type must be presented in Schema by a single instance (**Sage-php** 
 throws when it discovers several instances with the same **name** in the schema).
 
 Therefore if you define your type as separate PHP class you must ensure that only one 
@@ -105,7 +105,7 @@ And use this registry in type definition:
 ```php
 <?php
 namespace MyApp;
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\ObjectType;
 
 class MyAType extends ObjectType
 {
