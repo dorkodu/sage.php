@@ -1,15 +1,15 @@
 # Built-in directives
-The directive is a way for a client to give GraphQL server additional context and hints on how to execute
+The directive is a way for a client to give Sage server additional context and hints on how to execute
 the query. The directive can be attached to a field or fragment and can affect the execution of the 
 query in any way the server desires.
 
-GraphQL specification includes two built-in directives:
+Sage specification includes two built-in directives:
  
 * **@include(if: Boolean)** Only include this field or fragment in the result if the argument is **true** 
 * **@skip(if: Boolean)** Skip this field or fragment if the argument is **true**
 
 For example:
-```graphql
+```Sage
 query Hero($episode: Episode, $withFriends: Boolean!) {
   hero(episode: $episode) {
     name
@@ -24,21 +24,21 @@ from the response. Important implementation detail: those fields will never be e
 (not just removed from response after execution).
 
 # Custom directives
-**graphql-php** supports custom directives even though their presence does not affect the execution of fields.
-But you can use [`GraphQL\Type\Definition\ResolveInfo`](../reference.md#graphqltypedefinitionresolveinfo) 
+**Sage-php** supports custom directives even though their presence does not affect the execution of fields.
+But you can use [`Sage\Type\Definition\ResolveInfo`](../reference.md#Sagetypedefinitionresolveinfo) 
 in field resolvers to modify the output depending on those directives or perform statistics collection.
  
 Other use case is your own query validation rules relying on custom directives.
 
-In **graphql-php** custom directive is an instance of `GraphQL\Type\Definition\Directive`
+In **Sage-php** custom directive is an instance of `Sage\Type\Definition\Directive`
 (or one of its subclasses) which accepts an array of following options:
 
 ```php
 <?php
-use GraphQL\Language\DirectiveLocation;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
+use Sage\Language\DirectiveLocation;
+use Sage\Type\Definition\Type;
+use Sage\Type\Definition\Directive;
+use Sage\Type\Definition\FieldArgument;
 
 $trackDirective = new Directive([
     'name' => 'track',
@@ -58,4 +58,4 @@ $trackDirective = new Directive([
 ```
 
 See possible directive locations in 
-[`GraphQL\Language\DirectiveLocation`](../reference.md#graphqllanguagedirectivelocation).
+[`Sage\Language\DirectiveLocation`](../reference.md#Sagelanguagedirectivelocation).

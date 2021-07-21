@@ -126,7 +126,7 @@ Think user friends or nested comments for example.
 
 **Sage-php** allows such types, but you have to use `callable` in 
 option **fields** (and/or **interfaces**).
- 
+
 For example:
 ```php
 <?php

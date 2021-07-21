@@ -1,65 +1,58 @@
-# Prerequisites
+# Getting Started
+
+## Prerequisites
+
 This documentation assumes your familiarity with Sage concepts. If it is not the case - 
-first learn about Sage on [the official website](http://Sage.org/learn/).
-
-# Installation
-
-Using [composer](https://getcomposer.org/doc/00-intro.md), run:
-
-```sh
-composer require webonyx/Sage-php
-```
-
-# Upgrading
-We try to keep library releases backwards compatible. But when breaking changes are inevitable 
-they are explained in [upgrade instructions](https://github.com/webonyx/Sage-php/blob/master/UPGRADE.md).
-
-# Install Tools (optional)
-While it is possible to communicate with Sage API using regular HTTP tools it is way 
-more convenient for humans to use [GraphiQL](https://github.com/Sage/graphiql) - an in-browser 
-IDE for exploring Sage APIs.
-
-It provides syntax-highlighting, auto-completion and auto-generated documentation for 
-Sage API.
-
-The easiest way to use it is to install one of the existing Google Chrome extensions:
-
- - [ChromeiQL](https://chrome.google.com/webstore/detail/chromeiql/fkkiamalmpiidkljmicmjfbieiclmeij)
- - [GraphiQL Feen](https://chrome.google.com/webstore/detail/graphiql-feen/mcbfdonlkfpbfdpimkjilhdneikhfklp)
-
-Alternatively, you can follow instructions on [the GraphiQL](https://github.com/Sage/graphiql)
-page and install it locally.
+first learn about Sage on [the website](http://Sage.org/learn/).
 
 
-# Hello World
+## Hello World
 Let's create a type system that will be capable to process following simple query:
-```
-query {
-  echo(message: "Hello World")
+
+```json
+{
+  "typ": "Person",
+  "atr": ["name"],
+  "arg": {
+    "id": 1
+  }
 }
 ```
 
-To do so we need an object type with field `echo`:
+To do so we need an Entity type `Person` with the attribute `name` **:**
 
 ```php
 <?php
-use Sage\Type\Definition\ObjectType;
+use Sage\Type\Definition\Entity;
 use Sage\Type\Definition\Type;
 
-$queryType = new ObjectType([
-    'name' => 'Query',
-    'fields' => [
-        'echo' => [
-            'type' => Type::string(),
-            'args' => [
-                'message' => Type::nonNull(Type::string()),
-            ],
-            'resolve' => function ($rootValue, $args) {
-                return $rootValue['prefix'] . $args['message'];
-            }
-        ],
-    ],
+$Person = new Entity([
+  'attributes' => [
+    'name' => $name,
+  ]
+  'resolver' => function ($) {
+		$id = $referenceValue['id'];
+  	$person = DataSource::getPersonById($id);
+		return $person->name;
+	} 
 ]);
+
+# Define the attribute 'name'
+# new Attribute(callable $resolver, array $constraints)
+$name = new Attribute(
+  function ($referenceValue) {
+		$id = $referenceValue['id'];
+  	$person = DataSource::getPersonById($id);
+		return $person->name;
+	},
+  [
+    'type'        => Type::string(),
+    'description' => "Name of a person."
+    'nonNull'     => true
+  ]
+);
+
+
 
 ```
 

@@ -4,13 +4,13 @@ internals of Sage runtime but is not required to use it.
 
 # Parsing
 
-TODOC
+WIP
 
 # Validating
-TODOC
+WIP
 
 # Executing
-TODOC
+WIP
 
 # Errors explained
 There are 3 types of errors in Sage:
@@ -30,6 +30,7 @@ If such field throws or returns unexpected value the value of the field in respo
 replaced with **null** and error entry will be registered.
 
 If an exception is thrown in the non-null field - error bubbles up to the first nullable field. 
-This nullable field is replaced with **null** and error entry is added to the result. 
+This nullable field is replaced with **null** and error entry is added to the result.
+
 If all fields up to the root are non-null - **data** entry will be removed from the result  
 and only **errors** key will be presented.

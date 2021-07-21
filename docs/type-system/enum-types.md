@@ -2,12 +2,12 @@
 Enumeration types are a special kind of scalar that is restricted to a particular set 
 of allowed values. 
 
-In **graphql-php** enum type is an instance of `GraphQL\Type\Definition\EnumType` 
+In **Sage-php** enum type is an instance of `Sage\Type\Definition\EnumType` 
 which accepts configuration array in constructor:
 
 ```php
 <?php
-use GraphQL\Type\Definition\EnumType;
+use Sage\Type\Definition\EnumType;
 
 $episodeEnum = new EnumType([
     'name' => 'Episode',
@@ -38,7 +38,7 @@ Enum Type constructor accepts an array with following options:
 Option | Type | Notes
 ------ | ---- | -----
 name | `string` | **Required.** Name of the type. When not set - inferred from array key (read about [shorthand field definition](#shorthand-definitions) below)
-description | `string` | Plain-text description of the type for clients (e.g. used by [GraphiQL](https://github.com/graphql/graphiql) for auto-generated documentation)
+description | `string` | Plain-text description of the type for clients (e.g. used by [GraphiQL](https://github.com/Sage/graphiql) for auto-generated documentation)
 values | `array` | List of enumerated items, see below for expected structure of each entry
 
 Each entry of **values** array in turn accepts following options:
@@ -47,7 +47,7 @@ Option | Type | Notes
 ------ | ---- | -----
 name | `string` | **Required.** Name of the item. When not set - inferred from array key (read about [shorthand field definition](#shorthand-definitions) below)
 value | `mixed` | Internal representation of enum item in your application (could be any value, including complex objects or callbacks)
-description | `string` | Plain-text description of enum value for clients (e.g. used by [GraphiQL](https://github.com/graphql/graphiql) for auto-generated documentation)
+description | `string` | Plain-text description of enum value for clients (e.g. used by [GraphiQL](https://github.com/Sage/graphiql) for auto-generated documentation)
 deprecationReason | `string` | Text describing why this enum value is deprecated. When not empty - item will not be returned by introspection queries (unless forced)
 
 
@@ -57,7 +57,7 @@ following shorthand for definition:
 
 ```php
 <?php
-use GraphQL\Type\Definition\EnumType;
+use Sage\Type\Definition\EnumType;
 
 $episodeEnum = new EnumType([
     'name' => 'Episode',
@@ -69,7 +69,7 @@ $episodeEnum = new EnumType([
 which is equivalent of:
 ```php
 <?php
-use GraphQL\Type\Definition\EnumType;
+use Sage\Type\Definition\EnumType;
 
 $episodeEnum = new EnumType([
     'name' => 'Episode',
@@ -86,7 +86,7 @@ which is in turn equivalent of the full form:
 
 ```php
 <?php
-use GraphQL\Type\Definition\EnumType;
+use Sage\Type\Definition\EnumType;
 
 $episodeEnum = new EnumType([
     'name' => 'Episode',
@@ -101,13 +101,13 @@ $episodeEnum = new EnumType([
 
 # Field Resolution
 When object field is of Enum Type, field resolver is expected to return an internal 
-representation of corresponding Enum item (**value** in config). **graphql-php** will 
+representation of corresponding Enum item (**value** in config). **Sage-php** will 
 then serialize this **value** to **name** to include in response:
 
 ```php
 <?php
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\EnumType;
+use Sage\Type\Definition\ObjectType;
 
 $episodeEnum = new EnumType([
     'name' => 'Episode',
@@ -142,13 +142,13 @@ $heroType = new ObjectType([
 ```
 
 The Reverse is true when the enum is used as input type (e.g. as field argument). 
-GraphQL will treat enum input as **name** and convert it into **value** before passing to your app.
+Sage will treat enum input as **name** and convert it into **value** before passing to your app.
 
 For example, given object type definition:
 ```php
 <?php
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ObjectType;
+use Sage\Type\Definition\Type;
+use Sage\Type\Definition\ObjectType;
 
 $heroType = new ObjectType([
     'name' => 'Hero',
@@ -167,7 +167,7 @@ $heroType = new ObjectType([
 ```
 
 Then following query:
-```graphql
+```Sage
 fragment on Hero {
     appearsInNewHope: appearsIn(NEWHOPE)
     appearsInEmpire: appearsIn(EMPIRE)
