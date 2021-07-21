@@ -11,11 +11,7 @@ See the documentation at [/docs](./docs).
 
 A general overview of Sage is available on the [website](https://libre.dorkodu.com/sage). That overview describes a simple set of Sage examples that exist as [tests](src/tests) in this repository. A good way to get started with Sage is the [walkthrough](https://libre.dorkodu.com/sage/walkthrough).
 
-### Install Sage.php
-
-— Work in progress.
-
-### Hello World
+### Installation
 
 — Work in progress.
 
