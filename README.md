@@ -1,10 +1,12 @@
 # Sage.php
 
-<img src="resources/sage-dark.png" style="width: 67%; margin: 10px auto;">
+<p align="center">
+  <img src="resources/sage-dark.png" style="width: 67%; margin: 10px auto;">
+</p>
 
 The PHP reference implementation for [Sage](https://libre.dorkodu.com/sage), a query-based data exchange protocol for APIs, created at [Dorkodu](https://dorkodu.com).
 
-See more complete documentation at [https://libre.dorkodu.com/sage.php](https://libre.dorkodu.com/sage.php).
+See more complete documentation at [/docs](./docs).
 
 ## Getting Started
 
