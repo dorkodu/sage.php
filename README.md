@@ -3,7 +3,7 @@
 <p align="center">
   <img src="resources/sage-php.svg" style="width: 67%; margin: 5px auto;">
 </p>
-The PHP reference implementation for [**Sage**](https://libre.dorkodu.com/sage), a query-based data exchange protocol for APIs, created at [Dorkodu](https://dorkodu.com).
+The PHP reference implementation for **[Sage](https://libre.dorkodu.com/sage)**, a query-based data exchange protocol for APIs, created at [Dorkodu](https://dorkodu.com).
 
 See the documentation at [/docs](./docs).
 
