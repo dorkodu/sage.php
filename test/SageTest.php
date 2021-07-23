@@ -1,16 +1,22 @@
 <?php
 
 use Dorkodu\Seekr\Seekr;
-use Dorkodu\Seekr\Test\TestFunction;
-use Dorkodu\Seekr\Test\TestRepository;
+use Dorkodu\Seekr\Test\{
+  TestFunction,
+  TestCase,
+  TestRepository
+};
 
-$passingTest = new TestFunction(
-  "a passing test callback.",
+Seekr::test(
+  "returns an undefined item from an array",
   function () {
-    echo "This test will pass :)";
+    $arr = [
+      'a' => 1,
+      'b' => 2
+    ];
+
+    if ($arr['c'] == null) {
+      throw new Exception();
+    }
   }
 );
-
-# initialize the test repository
-$SageTest = new TestRepository();
-$SageTest->function($passingTest);
