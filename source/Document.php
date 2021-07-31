@@ -17,6 +17,13 @@ class Document
     return $this->map;
   }
 
+  /**
+   * Returns the query with given name.
+   *
+   * @param string $name
+   * @return Query if has a query with given name
+   * @return null if does not have a query with given name
+   */
   public function query(string $name)
   {
     return array_key_exists($name, $this->map)
