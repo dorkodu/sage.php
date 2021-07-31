@@ -35,4 +35,28 @@ class Document
   {
     $this->map[$name] = $query;
   }
+
+  /**
+   * Removes a query from document.
+   *
+   * @param string $name
+   * @return void
+   */
+  public function removeQuery(string $name)
+  {
+    unset($this->map[$name]);
+  }
+
+  public function __construct(array $queries)
+  {
+    /*
+     * $queries array must be in this shape: 
+     * [ string : Query ]
+     * 
+     * assert: 
+     *  - it has keys as strings
+     *  - it has values as Sage\Query instances.
+     */
+    $this->map = $queries;
+  }
 }
