@@ -23,4 +23,16 @@ class Document
       ? $this->map[$name]
       : null;
   }
+
+  /**
+   * Adds a query to document.
+   *
+   * @param string $name
+   * @param Query $query
+   * @return void
+   */
+  public function addQuery(string $name, Query $query)
+  {
+    $this->map[$name] = $query;
+  }
 }
