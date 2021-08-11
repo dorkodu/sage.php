@@ -2,6 +2,8 @@
 
 namespace Dorkodu\Seekr;
 
+error_reporting(0);
+
 use Dorkodu\Seekr\Test\{
   TestCase,
   TestResult,
