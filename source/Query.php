@@ -35,6 +35,13 @@ class Query
    */
   private $arguments;
 
+  /**
+   * @param string $type
+   * @param string[] $attributes
+   * @param string $act
+   * @param array $arguments
+   * @param array $links
+   */
   public function __construct(
     string $type,
     array $attributes,
