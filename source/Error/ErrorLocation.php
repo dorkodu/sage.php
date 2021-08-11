@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Sage\Error;
 
-class ErrorLocation
+use JsonSerializable;
+
+class ErrorLocation implements JsonSerializable
 {
   public const ATTRIBUTE = "attribute";
   public const LINK = "link";
@@ -28,14 +30,14 @@ class ErrorLocation
    * Metadata about this error.
    * e.g. name of the field
    *
-   * @var string|null
+   * @var array|null
    */
   public $meta;
 
   /**
    * @param string|null $query
    * @param string|null $field
-   * @param array $metadata
+   * @param array|null $metadata
    */
   public function __construct($query = null, $field = null, array $meta = null)
   {
@@ -60,5 +62,33 @@ class ErrorLocation
 
   public function __set($name, $value)
   {
+  }
+
+  /**
+   * @return int[]
+   */
+  public function toArray()
+  {
+    return [
+      'query'   => $this->query,
+      'field' => $this->field,
+      'meta' => $this->meta
+    ];
+  }
+
+  /**
+   * @return int[]
+   */
+  public function toSerializableArray()
+  {
+    return $this->toArray();
+  }
+
+  /**
+   * @return int[]
+   */
+  public function jsonSerialize()
+  {
+    return $this->toSerializableArray();
   }
 }
