@@ -22,7 +22,7 @@ use Exception;
 /**
  * Seekr - a minimalist PHP testing library for writing better tests easily and wisely.
  * 
- * @author     Doruk Eray (@doruk4ever) <doruk@dorkodu.com>
+ * @author     Doruk Eray (@dorkodu) <doruk@dorkodu.com>
  * @copyright  (c) 2021, Doruk Eray
  * @link       <https://github.com/dorkodu/seekr>
  * @license    The MIT License (MIT)
@@ -82,10 +82,10 @@ class Seekr
   {
     static::$repo = new TestRepository();
 
-    static::$log = array(
-      'callbacks' => array(),
-      'cases' => array()
-    );
+    static::$log = [
+      'callbacks' => [],
+      'cases' => []
+    ];
 
     static::$successCount = 0;
     static::$failureCount = 0;
@@ -101,6 +101,7 @@ class Seekr
   public static function testCase(TestCase $test)
   {
     static::newRepositoryIfEmpty();
+
     static::$repo->case($test);
   }
 
@@ -115,8 +116,7 @@ class Seekr
   public static function test(string $description, Closure $closure)
   {
     static::newRepositoryIfEmpty();
-    $test = new TestFunction($description, $closure);
-    static::$repo->function($test);
+    static::$repo->function($description, $closure);
   }
 
   /**

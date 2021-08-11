@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Dorkodu\Seekr\Test;
 
+use Closure;
 use Dorkodu\Seekr\Test\TestCase;
 use Dorkodu\Seekr\Test\TestFunction;
-use Dorkodu\Seekr\Exceptions\ShouldNotHappen;
-use Dorkodu\Seekr\Exceptions\TestAlreadyExist;
 
 class TestRepository
 {
@@ -16,29 +15,30 @@ class TestRepository
    *
    * @var TestCase[]
    */
-  private $_testCases = array();
+  private $_testCases = [];
 
   /**
    * Holds the single test methods
    *
    * @var TestFunction[]
    */
-  private $_testFunctions = array();
+  private $_testFunctions = [];
 
   public function case(TestCase $testCase)
   {
     array_push($this->_testCases, $testCase);
   }
 
-  public function function(TestFunction $test)
+  public function function(string $description, Closure $callback)
   {
+    $test = new TestFunction($description, $callback);
     array_push($this->_testFunctions, $test);
   }
 
   public function isEmpty()
   {
     return empty($this->_testCases) &&
-      empty($this->testMethods);
+      empty($this->_testFunctions);
   }
 
   public function hasAnyTestCases()
@@ -48,7 +48,7 @@ class TestRepository
 
   public function hasAnyTestMethods()
   {
-    return !empty($this->testMethods);
+    return !empty($this->_testFunctions);
   }
 
   public function testCases()
