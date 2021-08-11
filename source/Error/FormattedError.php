@@ -283,7 +283,7 @@ class FormattedError
     if ($var instanceof Type) {
       // TODO: Replace with schema printer call
       if ($var instanceof WrappingType) {
-        $var = $var->getWrappedType(true);
+        $var = $var->wrappedType(true);
       }
 
       return 'SageType: ' . $var->name;
