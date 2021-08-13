@@ -144,14 +144,6 @@ class Error extends Exception implements JsonSerializable, ClientAware
   }
 
   /**
-   * @return mixed[]
-   */
-  public static function formatError(Error $error)
-  {
-    return $error->toSerializableArray();
-  }
-
-  /**
    * @inheritdoc
    */
   public function isClientSafe()
