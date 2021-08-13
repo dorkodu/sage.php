@@ -7,11 +7,10 @@ use InvalidArgumentException;
 
 /**
  * A complicated wrapper class for common array use cases.
- * Difficulty = Hardcore
  * 
  * @author     Doruk Eray (@doruk4ever) <doruk@dorkodu.com>
  * @copyright  (c) 2021, Doruk Eray
- * @link       <https://github.com/dorukdorkodu/dorkodu-utils>
+ * @link       <https://github.com/dorukeray/utils>
  * @license    The MIT License (MIT)
  */
 class Arr

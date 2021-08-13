@@ -4,56 +4,80 @@ declare(strict_types=1);
 
 namespace Sage\Utils;
 
-use ErrorException;
-use Exception;
-use Sage\Error\Error;
-use Sage\Error\InvariantViolation;
-use Sage\Error\Warning;
-use Sage\Language\AST\Node;
-use Sage\Type\Definition\Type;
-use Sage\Type\Definition\WrappingType;
-use InvalidArgumentException;
-use LogicException;
 use stdClass;
+use Exception;
 use Traversable;
-use function array_keys;
-use function array_map;
-use function array_reduce;
-use function array_shift;
-use function array_slice;
-use function array_values;
+use function max;
+use function ord;
+use function pack;
+use ErrorException;
 use function asort;
 use function count;
+use function range;
+use LogicException;
 use function dechex;
-use function func_get_args;
-use function func_num_args;
-use function get_class;
-use function gettype;
-use function is_array;
 use function is_int;
+use function unpack;
+use function gettype;
+use function sprintf;
+use Sage\Error\Error;
+use function is_array;
+use function array_map;
+use function get_class;
 use function is_object;
 use function is_scalar;
 use function is_string;
-use function json_encode;
-use function levenshtein;
-use function max;
-use function mb_convert_encoding;
 use function mb_strlen;
 use function mb_substr;
-use function method_exists;
-use function ord;
-use function pack;
+use Sage\Error\Warning;
+use function array_keys;
 use function preg_match;
-use function property_exists;
-use function range;
-use function restore_error_handler;
-use function set_error_handler;
-use function sprintf;
 use function strtolower;
-use function unpack;
+use function array_shift;
+use function array_slice;
+use function json_encode;
+use function levenshtein;
+use function array_reduce;
+use function array_values;
+use function func_get_args;
+use function func_num_args;
+use function method_exists;
+use Sage\Language\AST\Node;
+use function property_exists;
+use InvalidArgumentException;
+use Sage\Type\Definition\Type;
+use function set_error_handler;
+use function mb_convert_encoding;
+use Sage\Error\InvariantViolation;
+use function restore_error_handler;
+use Sage\Type\Definition\WrappingType;
 
 class Utils
 {
+  /**
+   * Asserts a premise. 
+   * When the statement is not true, throws a LogicException with given message and code.
+   *
+   * @param boolean $statement
+   * @param string $contradictionMessage A descriptive message about that
+   * @param string $code Like a unique identifier of that contradiction in your code
+   * @return void
+   */
+  public static function premise($statement, $message = "", $code = null)
+  {
+    switch ($statement) {
+      case false:
+        throw new LogicException($message, $code);
+        break;
+      case true:
+        return true;
+        break;
+      default:
+        throw new LogicException("Cannot evaluate the statement of the premise.", "PREMISE");
+        break;
+    }
+  }
+
   public static function undefined()
   {
     static $undefined;
@@ -93,7 +117,7 @@ class Utils
         $cls = get_class($obj);
         Warning::warn(
           sprintf("Trying to set non-existing property '%s' on class '%s'", $key, $cls),
-          Warning::WARNING_ASSIGN
+          Warning::ASSIGN
         );
       }
       $obj->{$key} = $value;
@@ -155,6 +179,7 @@ class Utils
 
   /**
    * @param iterable<mixed> $iterable
+   * @param callable $fn
    *
    * @return array<mixed>
    *
@@ -329,7 +354,8 @@ class Utils
         array_shift($args);
         $message = sprintf(...$args);
       }
-      // TODO switch to Error here
+
+      // TODO: switch to Error here
       throw new InvariantViolation($message);
     }
   }
@@ -344,7 +370,7 @@ class Utils
     if ($var instanceof Type) {
       // FIXME: Replace with schema printer call
       if ($var instanceof WrappingType) {
-        $var = $var->getWrappedType(true);
+        $var = $var->wrappedType(true);
       }
 
       return $var->name;
@@ -402,7 +428,6 @@ class Utils
       if (method_exists($var, '__toString')) {
         return (string) $var;
       }
-
       return 'instance of ' . get_class($var);
     }
     if (is_array($var)) {
@@ -522,26 +547,17 @@ class Utils
    * Returns an Error if a name is invalid.
    *
    * @param string    $name
-   * @param Node|null $node
    *
    * @return Error|null
    */
-  public static function isValidNameError($name, $node = null)
+  public static function isValidNameError($name)
   {
     self::invariant(is_string($name), 'Expected string');
+    self::invariant(!empty($name), 'Expected non-empty string');
 
-    if (isset($name[1]) && $name[0] === '_' && $name[1] === '_') {
+    if ($name[0] === '@' && $name[1] === '$') {
       return new Error(
-        sprintf('Name "%s" must not begin with "__", which is reserved by ', $name) .
-          'Sage introspection.',
-        $node
-      );
-    }
-
-    if (!preg_match('/^[_a-zA-Z][_a-zA-Z0-9]*$/', $name)) {
-      return new Error(
-        sprintf('Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but "%s" does not.', $name),
-        $node
+        sprintf('Name "%s" must not begin with "@", or "$", which is reserved by Sage.', $name)
       );
     }
 
@@ -620,6 +636,8 @@ class Utils
   }
 
   /**
+   * ?! This is wonderful, dude :D
+   * 
    * Given an invalid input string and a list of valid options, returns a filtered
    * list of valid options sorted based on their similarity with the input.
    *
