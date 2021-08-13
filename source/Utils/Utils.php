@@ -555,9 +555,9 @@ class Utils
     self::invariant(is_string($name), 'Expected string');
     self::invariant(!empty($name), 'Expected non-empty string');
 
-    if ($name[0] === '@' && $name[1] === '$') {
+    if ($name[0] === '@' && $name[0] === '$') {
       return new Error(
-        sprintf('Name "%s" must not begin with "@", or "$", which is reserved by Sage.', $name)
+        sprintf('Name "%s" must not begin with "@", or "$", which are reserved by Sage.', $name)
       );
     }
 
