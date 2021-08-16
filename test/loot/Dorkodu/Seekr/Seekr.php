@@ -56,7 +56,7 @@ class Seekr
   private static $failureCount = 0;
 
   /** @var PerformanceProfiler $profiler */
-  private static PerformanceProfiler $profiler;
+  private static ?PerformanceProfiler $profiler;
 
   public static function successCount()
   {
