@@ -2,8 +2,15 @@
 
 namespace Sage\Type\Definition;
 
-class Artifact
+use Sage\Error\Error;
+use Sage\Utils\Utils;
+use Sage\Error\InvariantViolation;
+
+abstract class Artifact
 {
+  /** @var string */
+  public $name;
+
   /** @var string|null */
   public $description;
 
@@ -22,7 +29,8 @@ class Artifact
 
   public function __construct(array $config)
   {
-    $this->description       = $config['description'] ?? null;
+    $this->name = $config['name'];
+    $this->description = $config['description'] ?? null;
     $this->deprecationReason = $config['deprecationReason'] ?? null;
     $this->deprecated = $config['deprecated'] ??
       (isset($config['deprecationReason']) ? true : false);
@@ -33,7 +41,16 @@ class Artifact
   /**
    * @throws InvariantViolation
    */
-  public function assertValid(Type $parentType)
+  abstract public function assertValid(Type $parentType);
+
+  public function assertNameIsValid(Type $parentType)
   {
+    try {
+      Utils::assertValidName($this->name);
+    } catch (Error $e) {
+      throw new InvariantViolation(
+        sprintf('%s.%s: %s', $parentType->name, $this->name, $e->getMessage())
+      );
+    }
   }
 }
