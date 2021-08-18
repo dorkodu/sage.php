@@ -552,8 +552,8 @@ class Utils
    */
   public static function isValidNameError($name)
   {
-    self::invariant(is_string($name), 'Expected string');
-    self::invariant(!empty($name), 'Expected non-empty string');
+    self::invariant(is_string($name), 'Expected name to be string');
+    self::invariant(!empty($name), 'Expected name to be non-empty string');
 
     if ($name[0] === '@' && $name[0] === '$') {
       return new Error(
