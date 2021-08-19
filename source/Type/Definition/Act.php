@@ -11,23 +11,30 @@ class Act extends Artifact
    *
    * @var callable
    */
-  public $callback;
+  public $do;
 
   public function __construct(array $config)
   {
     parent::__construct($config);
-    $this->resolveFunction   = $config['resolve'] ?? null;
+    $this->do = $config['do'] ?? null;
   }
 
   public function assertValid(Type $parentType)
   {
-    //? Assert: $this->callback is a callable
+    $this->assertNameIsValid($parentType);
+    $this->assertCallbackIsValid($parentType);
+  }
+
+  public function assertCallbackIsValid(Type $parentType)
+  {
+    //? Assert: $this->do is a callable
     Utils::invariant(
-      is_callable($this->callback),
+      is_callable($this->do),
       sprintf(
-        '%s - Act function must be a callable, but got: %s',
+        "%s.%s - Act function 'do' must be a callable, but got: %s",
         $parentType->name,
-        Utils::printSafe($this->callback)
+        $this->name,
+        Utils::printSafe($this->do)
       )
     );
   }
