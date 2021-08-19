@@ -13,23 +13,23 @@ use Sage\Type\Definition\Artifact;
 class Attribute extends Artifact
 {
   /**
-   * Callback for resolving field value given parent value.
+   * Callback for resolving attribute value given reference value.
    *
    * @var callable
    */
-  private $resolve;
+  public $resolve;
 
   /**
-   * Type constraint for attribute.
+   * Type constraint for the attribute.
    *
    * @var Type|null
    */
-  private $type;
+  public $type;
 
   /**
    * @param mixed[] $config
    */
-  protected function __construct(array $config)
+  public function __construct(array $config)
   {
     parent::__construct($config);
 
@@ -63,10 +63,16 @@ class Attribute extends Artifact
           '%s.%s - Attribute type constraint must be either null or Output Type but got: %s',
           $parentType->name,
           $this->name,
-          Utils::printSafe($this->type)
+          Utils::printSafe($type)
         )
       );
     }
+  }
+
+  public function hasTypeConstraint()
+  {
+    return $this->type !== null
+      && $this->type instanceof Type;
   }
 
   public function assertResolveIsValid(Type $parentType)
