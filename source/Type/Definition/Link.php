@@ -12,27 +12,28 @@ use Sage\Type\Definition\Artifact;
 class Link extends Artifact
 {
   /**
-   * Callback for resolving field value given parent value.
+   * Callback for resolving link given reference value and context info.
+   * Returns a map to be used as reference value when querying for linked Entity type.
    *
    * @var callable
    */
   public $resolve;
 
   /**
-   * The Entity type this link connects to.
+   * The linked Entity type.
    *
-   * @var Entity 
+   * @var Entity
    */
-  public $type;
+  public $linksTo;
 
   /**
    * @param mixed[] $config
    */
-  protected function __construct(array $config)
+  public function __construct(array $config)
   {
     parent::__construct($config);
 
-    $this->type = $config['type'] ?? null;
+    $this->linksTo = $config['linksTo'] ?? null;
     $this->resolve = $config['resolve'] ?? null;
   }
 
@@ -43,18 +44,19 @@ class Link extends Artifact
   {
     $this->assertNameIsValid($parentType);
     $this->assertResolveIsValid($parentType);
+    $this->assertLinkedTypeIsValid($parentType);
   }
 
-  public function assertTypeIsValid(Type $parentType)
+  public function assertLinkedTypeIsValid(Type $parentType)
   {
-    //? Assert: type is an instance of Entity. 
+    //? Assert: linksTo is an instance of Entity. 
     Utils::invariant(
-      $this->type instanceof Entity,
+      $this->linksTo instanceof Entity,
       sprintf(
-        '%s.%s - Link type must be Entity but got: %s',
+        '%s.%s - Linked type must be Entity but got: %s',
         $parentType->name,
         $this->name,
-        Utils::printSafe($this->type)
+        Utils::printSafe($this->linksTo)
       )
     );
   }
