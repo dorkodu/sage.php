@@ -5,12 +5,7 @@ declare(strict_types=1);
 namespace Sage\Type\Definition;
 
 use function sprintf;
-use Sage\Error\Error;
-use Sage\Type\Schema;
 use Sage\Utils\Utils;
-use function is_array;
-use function is_string;
-use Sage\Error\Warning;
 use function is_callable;
 use Sage\Error\InvariantViolation;
 use Sage\Type\Definition\Artifact;
@@ -22,9 +17,13 @@ class Attribute extends Artifact
    *
    * @var callable
    */
-  private $resolveFunction;
+  private $resolve;
 
-  /** @var Type|null */
+  /**
+   * Type constraint for attribute.
+   *
+   * @var Type|null
+   */
   private $type;
 
   /**
@@ -35,34 +34,7 @@ class Attribute extends Artifact
     parent::__construct($config);
 
     $this->type = $config['type'] ?? null;
-    $this->resolveFunction = $config['resolve'] ?? null;
-  }
-
-  public function type(): Type
-  {
-    if (!isset($this->type)) {
-      $type = Schema::resolveType($this->config['type']);
-
-      //? Assert: $type must be an instance of Type
-      Utils::premise($type instanceof Type);
-      $this->type = $type;
-    }
-
-    return $this->type;
-  }
-
-  public function resolve(): callable
-  {
-    if (!isset($this->type)) {
-      $resolve = $this->config['resolve'] ?? null;
-
-      //? Assert: $resolve must be a callable
-      Utils::premise(is_callable($resolve));
-
-      $this->resolveFunction = $resolve;
-    }
-
-    return $this->resolveFunction;
+    $this->resolve = $config['resolve'] ?? null;
   }
 
   /**
@@ -70,13 +42,43 @@ class Attribute extends Artifact
    */
   public function assertValid(Type $parentType)
   {
-    //? Assert: resolver is a callable 
+    $this->assertNameIsValid($parentType);
+    $this->assertResolveIsValid($parentType);
+    $this->assertTypeConstraintIsValid($parentType);
+  }
+
+  public function assertTypeConstraintIsValid(Type $parentType)
+  {
+    $type = $this->type;
+
+    if ($type !== null) {
+      if ($type instanceof WrappingType) {
+        $type = $type->wrappedType(true);
+      }
+
+      //? Assert: type constraint is either null or an instance of Type & OutputType 
+      Utils::invariant(
+        $type instanceof OutputType,
+        sprintf(
+          '%s.%s - Attribute type constraint must be either null or Output Type but got: %s',
+          $parentType->name,
+          $this->name,
+          Utils::printSafe($this->type)
+        )
+      );
+    }
+  }
+
+  public function assertResolveIsValid(Type $parentType)
+  {
+    //? Assert: resolve is a callable
     Utils::invariant(
-      is_callable($this->resolveFunction),
+      is_callable($this->resolve),
       sprintf(
-        '%s - attribute resolver must be a function, but got: %s',
+        '%s.%s - Attribute resolver must be a function, but got: %s',
         $parentType->name,
-        Utils::printSafe($this->resolveFunction)
+        $this->name,
+        Utils::printSafe($this->resolve)
       )
     );
   }
