@@ -8,6 +8,10 @@ use Sage\Error\InvariantViolation;
 
 abstract class Artifact
 {
+  public const ATTRIBUTE = 'attribute';
+  public const ACT = 'act';
+  public const LINK = 'link';
+
   /** @var string */
   public $name;
 
