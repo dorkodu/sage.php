@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Sage\Type\Definition;
 
-use function sprintf;
-use Sage\Utils\Utils;
-use function is_callable;
-use Sage\Error\InvariantViolation;
 use Sage\Type\Definition\Artifact;
+use Sage\Error\InvariantViolation;
+use Sage\Utils\Utils;
+use function sprintf;
+use function is_callable;
 
 class Attribute extends Artifact
 {
   /**
    * Callback for resolving attribute value given reference value.
-   *
+   * 
    * @var callable
    */
   public $resolve;
 
   /**
    * Type constraint for the attribute.
-   *
+   * 
    * @var Type|null
    */
   public $type;

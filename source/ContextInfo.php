@@ -6,9 +6,6 @@ namespace Sage;
 
 use Sage\Query;
 use Sage\Type\Schema;
-use Sage\Type\Definition\Act;
-use Sage\Type\Definition\Link;
-use Sage\Type\Definition\Attribute;
 use Sage\Type\Definition\Artifact;
 use Sage\Type\Definition\Entity;
 
@@ -24,29 +21,33 @@ class ContextInfo
    * The definition of the artifact being resolved.
    *
    * @api
+   * @var Artifact|null
    */
-  public ?Artifact $artifact;
+  public $artifact;
 
   /**
    * Parent type (Entity) of the artifact being resolved.
    *
    * @api
+   * @var Entity
    */
-  public Entity $entity;
+  public $entity;
 
   /**
    * Instance of a schema used for execution.
    *
    * @api
+   * @var Schema
    */
-  public Schema $schema;
+  public $schema;
 
   /**
    * Instance of the query requested to be executed.
-   *  
+   *
    * @api
+   * @var Query
    */
-  public Query $query;
+  public $query;
 
   /**
    * A map given for use as the context of the service, like a simple dependency container.
@@ -54,7 +55,7 @@ class ContextInfo
    * @api
    * @var mixed[]
    */
-  public array $value;
+  public $value;
 
   public function __construct(
     ?Artifact $artifact,
@@ -74,7 +75,6 @@ class ContextInfo
   {
     return $this->$name;
   }
-
 
   //? ContextInfo must be immutable, this is the way I know how to do so. 
   public function __set($name, $value)
