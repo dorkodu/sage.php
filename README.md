@@ -30,4 +30,3 @@ See also some of our [contributions](https://libre.dorkodu.com) that we are maki
 ## License
 
 Sage.php is open-sourced software licensed under the [MIT license](LICENSE).
-
