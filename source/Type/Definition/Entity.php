@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sage\Type\Definition;
 
+use Sage\ContextInfo;
 use Sage\Deferred;
 use Sage\Error\InvariantViolation;
 use Sage\Type\Schema;
@@ -18,7 +19,7 @@ use function sprintf;
  * Entity Type Definition
  *
  * Almost all of the Sage types you define will be Entity types.
- * Entity types have attributes, acts and links.
+ * Entities are composite types, which contain artifacts (attributes, acts and links).
  *
  * Example:
  *
@@ -31,31 +32,46 @@ use function sprintf;
  */
 class Entity extends Type
 {
-  /** @var callable|null */
-  public $resolver;
+  /** @var callable */
+  public $resolve;
 
   /** @var Attribute[] */
-  private $attributes;
+  public $attributes;
 
   /** @var Act[] */
-  private $acts;
+  public $acts;
 
   /** @var Link[] */
-  private $links;
+  public $links;
 
-  /** @var string */
-  private $description;
+  /** @var bool */
+  public $deprecated = false;
 
-  /** @var Constraint[] */
-  private $constraints;
+  /** @var string|null */
+  public $deprecationReason;
+
+  /**
+   * Original type definition configuration
+   *
+   * @var array
+   */
+  public $config;
 
   /**
    * @param mixed[] $config
    */
   public function __construct(array $config)
   {
-    $this->name        = $config['name'];
-    $this->description = $config['description'] ?? null;
+    $this->name              = $config['name'];
+    $this->description       = $config['description'] ?? null;
+    $this->deprecationReason = $config['deprecationReason'] ?? null;
+    $this->deprecated        = $config['deprecated'] ?? (isset($config['deprecationReason']) ? true : false);
+
+    $this->resolve = $config['resolve'] ?? null;
+
+    $this->config = $config;
+
+    // TODO: add attributes, acts and links
   }
 
   /**
