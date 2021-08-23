@@ -81,14 +81,12 @@ class Entity extends Type
    *
    * @throws InvariantViolation
    */
-  public static function assertEntityType($type): self
+  public static function assertEntityType($type)
   {
     Utils::invariant(
       $type instanceof self,
       'Expected ' . Utils::printSafe($type) . ' to be a Sage Entity type.'
     );
-
-    return $type;
   }
 
   /**
@@ -96,11 +94,12 @@ class Entity extends Type
    */
   public function attribute(string $name): Attribute
   {
-    if (!isset($this->attributes)) {
-      $this->initializeFields();
-    }
-
-    Utils::invariant(isset($this->fields[$name]), 'Attribute "%s" is not defined for type "%s"', $name, $this->name);
+    Utils::invariant(
+      isset($this->attributes[$name]),
+      'Attribute "%s" is not defined for Entity "%s"',
+      $name,
+      $this->name
+    );
 
     return $this->attributes[$name];
   }
@@ -111,44 +110,55 @@ class Entity extends Type
    */
   public function hasAttribute(string $name): bool
   {
-    if (!isset($this->attributes)) {
-      $this->initializeAttributes();
-    }
-
     return isset($this->attributes[$name]);
   }
 
   /**
-   * @return Attributes[]
-   *
    * @throws InvariantViolation
    */
-  public function attributes(): array
+  public function act(string $name)
   {
-    if (!isset($this->attributes)) {
-      $this->initializeAttributes();
-    }
+    Utils::invariant(
+      isset($this->acts[$name]),
+      'Act "%s" is not defined for Entity "%s"',
+      $name,
+      $this->name
+    );
 
-    return $this->attributes;
-  }
-
-  protected function initializeAttributes(): void
-  {
-    $fields       = $this->config['fields'] ?? [];
-    $this->fields = Attribute::defineFieldMap($this, $fields);
+    return $this->acts[$name];
   }
 
   /**
-   * @param mixed $value
-   * @param mixed $context
-   *
-   * @return bool|Deferred|null
+   * @param string $name
+   * @return boolean
    */
-  public function isTypeOf($value, $context, ResolveInfo $info)
+  public function hasAct(string $name)
   {
-    return isset($this->config['isTypeOf'])
-      ? $this->config['isTypeOf']($value, $context, $info)
-      : null;
+    return isset($this->acts[$name]);
+  }
+
+  /**
+   * @throws InvariantViolation
+   */
+  public function link(string $name): Link
+  {
+    Utils::invariant(
+      isset($this->links[$name]),
+      'Link "%s" is not defined for Entity "%s"',
+      $name,
+      $this->name
+    );
+
+    return $this->links[$name];
+  }
+
+  /**
+   * @param string $name
+   * @return boolean
+   */
+  public function hasLink(string $name)
+  {
+    return isset($this->links[$name]);
   }
 
   /**
@@ -156,31 +166,37 @@ class Entity extends Type
    * Note: this method is shallow, it won't validate object fields and their arguments.
    *
    * @throws InvariantViolation
+   * 
+   * @return void
    */
-  public function assertValid(): void
+  public function assertValid()
   {
     parent::assertValid();
 
-    // Assert: description must be a string.
-    Utils::invariant(
-      $this->description === null || is_string($this->description),
-      sprintf(
-        '%s description must be string if set, but it is: %s',
-        $this->name,
-        Utils::printSafe($this->description)
-      )
-    );
+    $this->assertResolveIsValid();
 
-    $isTypeOf = $this->config['isTypeOf'] ?? null;
-
-    # Assert: definition must be a string.
-    Utils::invariant(
-      $isTypeOf === null || is_callable($isTypeOf),
-      sprintf('%s must provide "isTypeOf" as a function, but got: %s', $this->name, Utils::printSafe($isTypeOf))
-    );
-
-    foreach ($this->attributes() as $attribute) {
+    //? Assert: all attributes, acts and links are valid.
+    foreach ($this->attributes as $attribute) {
       $attribute->assertValid($this);
     }
+    foreach ($this->acts as $act) {
+      $act->assertValid($this);
+    }
+    foreach ($this->links as $link) {
+      $link->assertValid($this);
+    }
+  }
+
+  public function assertResolveIsValid()
+  {
+    //? Assert: resolve is a callable
+    Utils::invariant(
+      is_callable($this->resolve),
+      sprintf(
+        '%s - Entity resolver must be a function returning a reference value map, but got: %s',
+        $this->name,
+        Utils::printSafe($this->resolve)
+      )
+    );
   }
 }
