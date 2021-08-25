@@ -7,7 +7,10 @@
 require_once "loom/Psr4Autoloader.php";
 
 $universalNamespaces = array(
-  'Dorkodu' => 'loot/Dorkodu'
+  'Sage' => '../source',
+  'Sage\Test' => './',
+  'Dorkodu' => 'loot/Dorkodu',
+  'Blog' => 'loot/Blog'
 );
 
 $psr4Autoloader = new Psr4Autoloader();
