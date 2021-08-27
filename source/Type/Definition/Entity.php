@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Sage\Type\Definition;
 
-use Sage\ContextInfo;
-use Sage\Deferred;
+use Sage\Type\Definition\Attribute;
+use Sage\Type\Definition\Act;
+use Sage\Type\Definition\Link;
 use Sage\Error\InvariantViolation;
-use Sage\Type\Schema;
 use Sage\Utils\Utils;
-use function array_map;
-use function is_array;
 use function is_callable;
-use function is_string;
 use function sprintf;
 
 /**
@@ -24,6 +21,7 @@ use function sprintf;
  * Example:
  *
  *   $AddressType = new Entity([
+ *     'name' => "Address",
  *     'attributes' => [
  *       'street' => $streetAttribute,
  *       'number' => $numberAttribute
@@ -71,7 +69,9 @@ class Entity extends Type
 
     $this->config = $config;
 
-    // TODO: add attributes, acts and links
+    $this->attributes = $config['attributes'] ?? [];
+    $this->acts = $config['acts'] ?? [];
+    $this->links = $config['links'] ?? [];
   }
 
   /**
@@ -105,18 +105,9 @@ class Entity extends Type
   }
 
   /**
-   * @param string $name
-   * @return boolean
-   */
-  public function hasAttribute(string $name): bool
-  {
-    return isset($this->attributes[$name]);
-  }
-
-  /**
    * @throws InvariantViolation
    */
-  public function act(string $name)
+  public function act(string $name): Act
   {
     Utils::invariant(
       isset($this->acts[$name]),
@@ -126,15 +117,6 @@ class Entity extends Type
     );
 
     return $this->acts[$name];
-  }
-
-  /**
-   * @param string $name
-   * @return boolean
-   */
-  public function hasAct(string $name)
-  {
-    return isset($this->acts[$name]);
   }
 
   /**
@@ -156,14 +138,31 @@ class Entity extends Type
    * @param string $name
    * @return boolean
    */
+  public function hasAttribute(string $name): bool
+  {
+    return isset($this->attributes[$name]);
+  }
+
+  /**
+   * @param string $name
+   * @return boolean
+   */
+  public function hasAct(string $name)
+  {
+    return isset($this->acts[$name]);
+  }
+
+  /**
+   * @param string $name
+   * @return boolean
+   */
   public function hasLink(string $name)
   {
     return isset($this->links[$name]);
   }
 
   /**
-   * Validates type config and throws if one of type options is invalid.
-   * Note: this method is shallow, it won't validate object fields and their arguments.
+   * Validates type configuration and throws if one of options is invalid.
    *
    * @throws InvariantViolation
    * 
@@ -173,18 +172,13 @@ class Entity extends Type
   {
     parent::assertValid();
 
+    //? Assert: all resolver function is valid. 
     $this->assertResolveIsValid();
 
-    //? Assert: all attributes, acts and links are valid.
-    foreach ($this->attributes as $attribute) {
-      $attribute->assertValid($this);
-    }
-    foreach ($this->acts as $act) {
-      $act->assertValid($this);
-    }
-    foreach ($this->links as $link) {
-      $link->assertValid($this);
-    }
+    //? Assert: all artifacts are valid.
+    $this->assertAttributesAreValid();
+    $this->assertActsAreValid();
+    $this->assertLinksAreValid();
   }
 
   public function assertResolveIsValid()
@@ -198,5 +192,66 @@ class Entity extends Type
         Utils::printSafe($this->resolve)
       )
     );
+  }
+
+  public function assertAttributesAreValid()
+  {
+    //? Assert: all attributes are valid.
+    foreach ($this->attributes as $name => $attribute) {
+
+      Utils::invariant(
+        $attribute instanceof Attribute,
+        "%s - 'attributes' must be a map of Attribute instances as values, but contains invalid item(s).",
+        $this->name
+      );
+
+      Utils::invariant(
+        is_string($name),
+        "%s - 'attributes' must be a map of string names as keys, but contains invalid key(s).",
+        $this->name
+      );
+
+      $attribute->assertValid($this);
+    }
+  }
+
+  public function assertActsAreValid()
+  {
+    //? Assert: all acts are valid.
+    foreach ($this->acts as $name => $act) {
+      Utils::invariant(
+        $act instanceof Act,
+        "%s - 'acts' must be a map of Act instances as values, but contains invalid item(s).",
+        $this->name
+      );
+
+      Utils::invariant(
+        is_string($name),
+        "%s - 'acts' must be a map of string names as keys, but contains invalid key(s).",
+        $this->name
+      );
+
+      $act->assertValid($this);
+    }
+  }
+
+  public function assertLinksAreValid()
+  {
+    //? Assert: all links are valid.
+    foreach ($this->links as $name => $link) {
+      Utils::invariant(
+        $link instanceof Link,
+        "%s - 'links' must be a map of Link instances as values, but contains invalid item(s).",
+        $this->name
+      );
+
+      Utils::invariant(
+        is_string($name),
+        "%s - 'links' must be a map of string names as keys, but contains invalid key(s).",
+        $this->name
+      );
+
+      $link->assertValid($this);
+    }
   }
 }
