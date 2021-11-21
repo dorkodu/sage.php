@@ -7,19 +7,22 @@ The PHP reference implementation for **[Sage](https://libre.dorkodu.com/sage)**,
 
 See the documentation at **[/docs](./docs)**.
 
+> #### `Note`
+>
+> The Sage.php project is a *work-in-progress*. 
+> Code and documentation are currently under development and are subject to change.
+
 ## Getting Started
 
-A general overview of Sage is available on the [website](https://libre.dorkodu.com/sage). That overview describes a simple set of Sage examples that exist as [tests](src/tests) in this repository. A good way to get started with Sage is the [official documentation](https://libre.dorkodu.com/sage/learn).
+A general overview of Sage is available on the [website](https://libre.dorkodu.com/sage). That overview describes a simple set of Sage examples that exist as [tests](test) in this repository. A good way to get started with Sage is the [official documentation](https://libre.dorkodu.com/sage/learn).
 
 ### Installation
 
-— Work in progress.
+*— Work in progress.*
 
 ## Contributing
 
-We welcome your contributions, even if it is a simple idea.
-
-Learn how to [contribute](./.github/CONTRIBUTING.md).
+We welcome your contributions, even if it is just a simple idea.
 
 ## Author
 
