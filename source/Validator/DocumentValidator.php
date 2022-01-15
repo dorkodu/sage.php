@@ -63,225 +63,225 @@ use Throwable;
  */
 class DocumentValidator
 {
-    /** @var ValidationRule[] */
-    private static $rules = [];
+  /** @var ValidationRule[] */
+  private static $rules = [];
 
-    /** @var bool */
-    private static $initRules = false;
+  /** @var bool */
+  private static $initRules = false;
 
-    /**
-     * Primary method for query validation. See class description for details.
-     *
-     * @param ValidationRule[]|null $rules
-     *
-     * @return Error[]
-     *
-     * @api
-     */
-    public static function validate(
-        Schema $schema,
-        Document $source
-    ): array {
-        $rules = static::allRules();
+  /**
+   * Primary method for query validation. See class description for details.
+   *
+   * @param ValidationRule[]|null $rules
+   *
+   * @return Error[]
+   *
+   * @api
+   */
+  public static function validate(
+    Schema $schema,
+    Document $source
+  ): array {
+    $rules = static::allRules();
 
-        if (true === is_array($rules) && 0 === count($rules)) {
-            // Skip validation if there are no rules
-            return [];
+    if (true === is_array($rules) && 0 === count($rules)) {
+      // Skip validation if there are no rules
+      return [];
+    }
+
+    return static::visitUsingRules($schema, $source, $rules);
+  }
+
+  /**
+   * Returns all global validation rules.
+   *
+   * @return ValidationRule[]
+   *
+   * @api
+   */
+  public static function allRules(): array
+  {
+    if (!self::$initRules) {
+      static::$rules = array_merge(static::defaultRules(), self::$rules);
+      static::$initRules = true;
+    }
+
+    return self::$rules;
+  }
+
+  public static function defaultRules()
+  {
+    if (null === self::$defaultRules) {
+      self::$rules = [];
+    }
+
+    return self::$defaultRules;
+  }
+
+  /**
+   * @return QuerySecurityRule[]
+   */
+  public static function securityRules(): array
+  {
+    // This way of defining rules is deprecated
+    // When custom security rule is required - it should be just added via DocumentValidator::addRule();
+    // TODO: deprecate this
+
+    if (null === self::$securityRules) {
+      self::$securityRules = [
+        DisableIntrospection::class => new DisableIntrospection(DisableIntrospection::DISABLED), // DEFAULT DISABLED
+        QueryDepth::class => new QueryDepth(QueryDepth::DISABLED), // default disabled
+        QueryComplexity::class => new QueryComplexity(QueryComplexity::DISABLED), // default disabled
+      ];
+    }
+
+    return self::$securityRules;
+  }
+
+  public static function sdlRules()
+  {
+    if (null === self::$sdlRules) {
+      self::$sdlRules = [
+        LoneSchemaDefinition::class => new LoneSchemaDefinition(),
+        KnownDirectives::class => new KnownDirectives(),
+        KnownArgumentNamesOnDirectives::class => new KnownArgumentNamesOnDirectives(),
+        UniqueDirectivesPerLocation::class => new UniqueDirectivesPerLocation(),
+        UniqueArgumentNames::class => new UniqueArgumentNames(),
+        UniqueInputFieldNames::class => new UniqueInputFieldNames(),
+        ProvidedRequiredArgumentsOnDirectives::class => new ProvidedRequiredArgumentsOnDirectives(),
+      ];
+    }
+
+    return self::$sdlRules;
+  }
+
+  /**
+   * This uses a specialized visitor which runs multiple visitors in parallel,
+   * while maintaining the visitor skip and break API.
+   *
+   * @param ValidationRule[] $rules
+   *
+   * @return Error[]
+   */
+  public static function visitUsingRules(Schema $schema, TypeInfo $typeInfo, DocumentNode $documentNode, array $rules): array
+  {
+    $context = new ValidationContext($schema, $documentNode, $typeInfo);
+    $visitors = [];
+    foreach ($rules as $rule) {
+      $visitors[] = $rule->getVisitor($context);
+    }
+
+    Visitor::visit($documentNode, Visitor::visitWithTypeInfo($typeInfo, Visitor::visitInParallel($visitors)));
+
+    return $context->getErrors();
+  }
+
+  /**
+   * Returns global validation rule by name. Standard rules are named by class name, so
+   * example usage for such rules:.
+   *
+   * $rule = DocumentValidator::getRule(Sage\Validator\Rules\QueryComplexity::class);
+   *
+   * @param string $name
+   *
+   * @api
+   */
+  public static function getRule($name): ?ValidationRule
+  {
+    $rules = static::allRules();
+
+    if (isset($rules[$name])) {
+      return $rules[$name];
+    }
+
+    $name = sprintf('Sage\\Validator\\Rules\\%s', $name);
+
+    return $rules[$name] ?? null;
+  }
+
+  /**
+   * Add rule to list of global validation rules.
+   *
+   * @api
+   */
+  public static function addRule(ValidationRule $rule): void
+  {
+    self::$rules[$rule->getName()] = $rule;
+  }
+
+  public static function isError($value)
+  {
+    return is_array($value)
+      ? count(array_filter(
+        $value,
+        static function ($item): bool {
+          return $item instanceof Throwable;
         }
+      )) === count($value)
+      : $value instanceof Throwable;
+  }
 
-        return static::visitUsingRules($schema, $source, $rules);
+  public static function append(&$arr, $items)
+  {
+    if (is_array($items)) {
+      $arr = array_merge($arr, $items);
+    } else {
+      $arr[] = $items;
     }
 
-    /**
-     * Returns all global validation rules.
-     *
-     * @return ValidationRule[]
-     *
-     * @api
-     */
-    public static function allRules(): array
-    {
-        if (!self::$initRules) {
-            static::$rules = array_merge(static::defaultRules(), self::$rules);
-            static::$initRules = true;
-        }
+    return $arr;
+  }
 
-        return self::$rules;
+  /**
+   * @param ValidationRule[]|null $rules
+   *
+   * @return Error[]
+   *
+   * @throws Exception
+   */
+  public static function validateSDL(
+    DocumentNode $documentAST,
+    ?Schema $schemaToExtend = null,
+    ?array $rules = null
+  ): array {
+    $usedRules = $rules ?? self::sdlRules();
+    $context = new SDLValidationContext($documentAST, $schemaToExtend);
+    $visitors = [];
+    foreach ($usedRules as $rule) {
+      $visitors[] = $rule->getSDLVisitor($context);
     }
 
-    public static function defaultRules()
-    {
-        if (null === self::$defaultRules) {
-            self::$rules = [];
-        }
+    Visitor::visit($documentAST, Visitor::visitInParallel($visitors));
 
-        return self::$defaultRules;
+    return $context->getErrors();
+  }
+
+  public static function assertValidSDL(DocumentNode $documentAST): void
+  {
+    $errors = self::validateSDL($documentAST);
+    if (count($errors) > 0) {
+      throw new Error(self::combineErrorMessages($errors));
+    }
+  }
+
+  public static function assertValidSDLExtension(DocumentNode $documentAST, Schema $schema): void
+  {
+    $errors = self::validateSDL($documentAST, $schema);
+    if (count($errors) > 0) {
+      throw new Error(self::combineErrorMessages($errors));
+    }
+  }
+
+  /**
+   * @param Error[] $errors
+   */
+  private static function combineErrorMessages(array $errors): string
+  {
+    $str = '';
+    foreach ($errors as $error) {
+      $str .= $error->getMessage() . "\n\n";
     }
 
-    /**
-     * @return QuerySecurityRule[]
-     */
-    public static function securityRules(): array
-    {
-        // This way of defining rules is deprecated
-        // When custom security rule is required - it should be just added via DocumentValidator::addRule();
-        // TODO: deprecate this
-
-        if (null === self::$securityRules) {
-            self::$securityRules = [
-                DisableIntrospection::class => new DisableIntrospection(DisableIntrospection::DISABLED), // DEFAULT DISABLED
-                QueryDepth::class => new QueryDepth(QueryDepth::DISABLED), // default disabled
-                QueryComplexity::class => new QueryComplexity(QueryComplexity::DISABLED), // default disabled
-            ];
-        }
-
-        return self::$securityRules;
-    }
-
-    public static function sdlRules()
-    {
-        if (null === self::$sdlRules) {
-            self::$sdlRules = [
-                LoneSchemaDefinition::class => new LoneSchemaDefinition(),
-                KnownDirectives::class => new KnownDirectives(),
-                KnownArgumentNamesOnDirectives::class => new KnownArgumentNamesOnDirectives(),
-                UniqueDirectivesPerLocation::class => new UniqueDirectivesPerLocation(),
-                UniqueArgumentNames::class => new UniqueArgumentNames(),
-                UniqueInputFieldNames::class => new UniqueInputFieldNames(),
-                ProvidedRequiredArgumentsOnDirectives::class => new ProvidedRequiredArgumentsOnDirectives(),
-            ];
-        }
-
-        return self::$sdlRules;
-    }
-
-    /**
-     * This uses a specialized visitor which runs multiple visitors in parallel,
-     * while maintaining the visitor skip and break API.
-     *
-     * @param ValidationRule[] $rules
-     *
-     * @return Error[]
-     */
-    public static function visitUsingRules(Schema $schema, TypeInfo $typeInfo, DocumentNode $documentNode, array $rules): array
-    {
-        $context = new ValidationContext($schema, $documentNode, $typeInfo);
-        $visitors = [];
-        foreach ($rules as $rule) {
-            $visitors[] = $rule->getVisitor($context);
-        }
-
-        Visitor::visit($documentNode, Visitor::visitWithTypeInfo($typeInfo, Visitor::visitInParallel($visitors)));
-
-        return $context->getErrors();
-    }
-
-    /**
-     * Returns global validation rule by name. Standard rules are named by class name, so
-     * example usage for such rules:.
-     *
-     * $rule = DocumentValidator::getRule(Sage\Validator\Rules\QueryComplexity::class);
-     *
-     * @param string $name
-     *
-     * @api
-     */
-    public static function getRule($name): ?ValidationRule
-    {
-        $rules = static::allRules();
-
-        if (isset($rules[$name])) {
-            return $rules[$name];
-        }
-
-        $name = sprintf('Sage\\Validator\\Rules\\%s', $name);
-
-        return $rules[$name] ?? null;
-    }
-
-    /**
-     * Add rule to list of global validation rules.
-     *
-     * @api
-     */
-    public static function addRule(ValidationRule $rule): void
-    {
-        self::$rules[$rule->getName()] = $rule;
-    }
-
-    public static function isError($value)
-    {
-        return is_array($value)
-            ? count(array_filter(
-                $value,
-                static function ($item): bool {
-                    return $item instanceof Throwable;
-                }
-            )) === count($value)
-            : $value instanceof Throwable;
-    }
-
-    public static function append(&$arr, $items)
-    {
-        if (is_array($items)) {
-            $arr = array_merge($arr, $items);
-        } else {
-            $arr[] = $items;
-        }
-
-        return $arr;
-    }
-
-    /**
-     * @param ValidationRule[]|null $rules
-     *
-     * @return Error[]
-     *
-     * @throws Exception
-     */
-    public static function validateSDL(
-        DocumentNode $documentAST,
-        ?Schema $schemaToExtend = null,
-        ?array $rules = null
-    ): array {
-        $usedRules = $rules ?? self::sdlRules();
-        $context = new SDLValidationContext($documentAST, $schemaToExtend);
-        $visitors = [];
-        foreach ($usedRules as $rule) {
-            $visitors[] = $rule->getSDLVisitor($context);
-        }
-
-        Visitor::visit($documentAST, Visitor::visitInParallel($visitors));
-
-        return $context->getErrors();
-    }
-
-    public static function assertValidSDL(DocumentNode $documentAST): void
-    {
-        $errors = self::validateSDL($documentAST);
-        if (count($errors) > 0) {
-            throw new Error(self::combineErrorMessages($errors));
-        }
-    }
-
-    public static function assertValidSDLExtension(DocumentNode $documentAST, Schema $schema): void
-    {
-        $errors = self::validateSDL($documentAST, $schema);
-        if (count($errors) > 0) {
-            throw new Error(self::combineErrorMessages($errors));
-        }
-    }
-
-    /**
-     * @param Error[] $errors
-     */
-    private static function combineErrorMessages(array $errors): string
-    {
-        $str = '';
-        foreach ($errors as $error) {
-            $str .= $error->getMessage()."\n\n";
-        }
-
-        return $str;
-    }
+    return $str;
+  }
 }
