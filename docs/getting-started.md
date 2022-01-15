@@ -3,7 +3,7 @@
 ## Prerequisites
 
 This documentation assumes your familiarity with Sage concepts. If it is not the case - 
-first learn about Sage on [the website](http://libre.dorkodu.org/sage/).
+first learn about Sage on [the website](http://libre.dorkodu.com/sage/).
 
 
 ## Hello World
@@ -23,54 +23,50 @@ To do so we need an Entity type `Person` with the attribute `name` **:**
 
 ```php
 <?php
+
 use Sage\Type\Definition\Entity;
 use Sage\Type\Definition\Type;
 
 # Define the Entity type 'Person'
-$Person = new Entity(
-  [
-    'name' => "Person",
-  	'attributes' => [
-    	'name' => $name,
-  	],
-  	'resolve' => function ($query, $context) {
-			$id = $query->argument('id');
-    	return [
-      	'id' => $id,
-      	'dataSource' => $context['dataSource']
-    	];
-		}
-	]
-);
+$Person = new Entity([
+  'name' => "Person",
+  'attributes' => [
+    'name' => $name,
+  ],
+  'resolve' => function ($query, $context) {
+    $id = $query->argument('id');
+    return [
+      'id' => $id,
+      'dataSource' => $context['dataSource']
+    ];
+  }
+]);
 
 # Define the attribute 'name'
-$name = new Attribute(
-  [
-    'name' => 'name',
-    'resolve' => function ($referenceValue) {
-			$id = $referenceValue['id'];
-  		$person = DataSource::getPersonById($id);
-			return $person->name;
-		},
-    'type'        => Type::string(),
-    'description' => "Name of a person."
-  ]
-);
+$name = new Attribute([
+  'name' => 'name',
+  'resolve' => function ($referenceValue) {
+		$id = $referenceValue['id'];
+  	$person = DataSource::getPersonById($id);
+		return $person->name;
+  },
+  'type'        => Type::string(),
+  'description' => "Name of a person."
+]);
 ```
 
 The interesting piece here is **resolve** option of Entity type definition. It is responsible for returning 
-a reference value, which will be used by artifact (attribute, act, link) resolvers.
+a reference value, which will be used by artifact resolvers.
 
-Now when our type is ready, let's create Sage endpoint file for it **Sage.php**:
+Now when our type is ready, let's create Sage endpoint file for it **:**
 
 ```php
 <?php
-
 use Sage\Sage;
 use Sage\Type\Schema;
 
 $schema = new Schema([
-    'Person' => $Person
+  'Person' => $Person
 ]);
 
 $rawInput = file_get_contents('php://input');
@@ -85,13 +81,13 @@ try {
   $result = Sage::execute($schema, $document, $context, $options);
   $output = $result->toArray();
 } catch (\Exception $e) {
-    $output = [
-        'errors' => [
-            [
-                'message' => $e->getMessage()
-            ]
-        ]
-    ];
+  $output = [
+  	'errors' => [
+    	[
+      	'message' => $e->getMessage()
+		  ]
+    ]
+  ];
 }
 
 header('Content-Type: application/json');
