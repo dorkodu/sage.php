@@ -13,10 +13,10 @@ class DataSource
       2 => new User(2, "Berk Cambaz", "berk@dorkodu.com")
     ],
     'posts' => [
-      1 => new Post(1, "First Post of Our Blog", "Hello World!", 1, 1600000000),
-      2 => new Post(2, "Introducing Lucid", "Lucid is the awesome and lightweight component-based library for JavaScript.", 1, 1615000000),
-      3 => new Post(1, "Introducing Sage", "Sage is a query-based data exchange protocol.", 1, 1629500000),
-      4 => new Post(1, "Sage.php Is Released!", "Sage.php the reference server implementation of the Sage protocol.", 1, 1629792730),
+      1 => new Note(1, "Hello World!", 1, 1600000000),
+      2 => new Note(2, "Lucid.js is a awesome & lightweight component-based library for JavaScript.", 1, 1615000000),
+      3 => new Note(1, "Sage is a query-based data exchange protocol.", 1, 1629500000),
+      4 => new Note(1, "Sage.php Is Released!", 1, 1629792730),
     ]
   ];
 
@@ -39,7 +39,7 @@ class DataSource
   {
     $id = self::generateId(self::$data['posts']);
 
-    $post = new Post($id, $title, $contents, $authorId, $timestamp);
+    $post = new Note($id, $title, $contents, $authorId, $timestamp);
 
     self::$data['posts'][$id] = $post;
   }

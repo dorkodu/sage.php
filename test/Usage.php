@@ -6,51 +6,44 @@ use Exception;
 
 use Blog\DataSource;
 use Sage\ContextInfo;
-use Dorkodu\Seekr\Seekr;
 use Dorkodu\Seekr\Test\TestCase;
 use Sage\Type\Definition\Entity;
 use Sage\Type\Definition\Attribute;
+use Sage\Type\Schema;
 
 class Usage extends TestCase
 {
-  public function setUp()
-  {
-  }
+    public Schema $schema;
 
-  public function registerSchema()
-  {
-    //? Attributes
-    $name = new Attribute([
+    public function setUp()
+    {
+        $schema = new Schema([
+      'Person' => $Person
+    ]);
+
+        //? Attributes
+        $name = new Attribute([
       'name' => 'name',
       'description' => 'Name of a User.',
       'resolve' => function ($referenceValue, ContextInfo $info) {
-        $id = $referenceValue['userId'];
-        $user = DataSource::getUserById($id);
-        return $user->email;
+          $id = $referenceValue['userId'];
+          $user = DataSource::getUserById($id);
+          return $user->email;
       }
     ]);
 
-    $email = new Attribute([
+        $email = new Attribute([
       'name' => 'email',
       'description' => 'Email of a User.',
       'resolve' => function ($referenceValue, ContextInfo $info) {
-        $id = $referenceValue['userId'];
-        $user = DataSource::getUserById($id);
-        return $user->email;
+          $id = $referenceValue['userId'];
+          $user = DataSource::getUserById($id);
+          return $user->email;
       }
     ]);
-  }
 
-  public function testExecuteQuery()
-  {
-    // Execute a valid Sage query.
-  }
-
-  public function testEntityDefinition()
-  {
-
-    // Define an Entity correctly.
-    $definition = new Entity([
+        //? Entities
+        $User = new Entity([
       'name' => "User",
       'description' => "Represents a user of the app.",
       'attributes' => [
@@ -60,18 +53,27 @@ class Usage extends TestCase
       'links' => [],
     ]);
 
-    $User = new Entity([
-      'name' => 'User',
+        $Note = new Entity([
+      'name' => 'Note',
       'attributes' => [
-        'name' => new Attribute([
-          'name' => "name",
-          'type' => Type::string(),
-        ]),
-        'email' => new Attribute([
-          'name' => "email",
-          'type' => Type::string()
-        ])
+        'id' => $id,
+        'contents' => $contents,
+        'authorId' => $authodId,
+        'timestamp' => $timestamp
       ]
     ]);
-  }
+    }
+
+    public function registerSchema()
+    {
+    }
+
+    public function testExecuteQuery()
+    {
+        // Execute a valid Sage query.
+    }
+
+    public function testEntityDefinition()
+    {
+    }
 }

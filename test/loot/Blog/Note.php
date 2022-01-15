@@ -2,13 +2,10 @@
 
 namespace Blog;
 
-class Post
+class Note
 {
   /** @var int */
   public $id;
-
-  /** @var string */
-  public $title;
 
   /** @var string */
   public $contents;
@@ -19,12 +16,11 @@ class Post
   /** @var int */
   public $timestamp;
 
-  public function __construct(string $id, string $title, string $contents, int $authorId, int $timestamp)
+  public function __construct(string $id, string $contents, int $authorId, int $timestamp)
   {
     $this->id = $id;
-    $this->title = $title;
     $this->contents = $contents;
     $this->authorId = $authorId;
-    $this->title = $title;
+    $this->timestamp = $timestamp;
   }
 }

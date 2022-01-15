@@ -15,4 +15,8 @@ class Internal extends TestCase
   public function testValidateQuery()
   {
   }
+
+  // TODO: add these tests:
+  //? SCHEMA: inlineSchemaDefinition, functionalSchemaDefinition
+
 }
