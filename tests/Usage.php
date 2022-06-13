@@ -17,10 +17,7 @@ class Usage extends TestCase
 
     public function setUp()
     {
-        $schema = new Schema([
-      'Person' => $Person
-    ]);
-
+        $schema = new Schema(['Person' => $Person]);
         //? Attributes
         $name = new Attribute([
       'name' => 'name',
