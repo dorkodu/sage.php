@@ -1,23 +1,23 @@
 <?php
   $json = <<<JSON
    {
-     "berk": {
+     "doruk": {
        "typ": "User",
        "atr": ["name", "about", "followerCount"],
        "arg": {
           "id": 123456
        },
        "lnk": {
-         "organization": "berk:organization"
+         "organization": "doruk:organization"
        }
      },
-     "berk:organization": {
+     "doruk:organization": {
        "atr": ["name", "website"],
        "lnk": {
-         "repos": "berk:organization:repos"
+         "repos": "doruk:organization:repos"
        }
      },
-     "berk:organization:repos": {
+     "doruk:organization:repos": {
        "atr": ["title", "description", "starCount"],
        "arg": {
           "filter": "A-Z",
@@ -28,24 +28,24 @@
   JSON;
 
   $graphQL = <<<GRAPHQL
-  {
-    user(id: 123456, filter: "A-Z", reverseOrder: true) {
-      name
-      about
-      followerCount
-      organization {
+    {
+      user(id: 123456, filter: "A-Z", reverseOrder: true) {
         name
-        website
-        starCount
-        repos(filter: "A-Z", reverseOrder: true) {
+        about
+        followerCount
+        organization {
           name
-          description
-          language
-          stars
+          website
+          starCount
+          repos(filter: "A-Z", reverseOrder: true) {
+            name
+            description
+            language
+            stars
+          }
         }
       }
     }
-  }
   GRAPHQL;
 
   class Stopwatch
@@ -113,6 +113,6 @@
 
   $timer->start();
   $parsedJson = json_decode(json: $json, associative: true);
-  $dummy = $parsedJson["berk"];
+  $dummy = $parsedJson["doruk"];
   printf("%.9f", $timer->passedTime());
   $timer->stop();
