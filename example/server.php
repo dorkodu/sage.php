@@ -1,33 +1,36 @@
 <?php
 
-require "schema.php";
-require "data.php";
+// for a simpler autoloading using Loom.
+require '__loom.php';
 
+require 'schema.php';
+require 'data.php';
+
+use Exception;
 use Sage\Sage;
-use Sage\Type\Schema;
-use Blog\DataSource;
-use \Exception;
 
 $rawInput = file_get_contents('php://input');
 $input = json_decode($rawInput, true);
 
 try {
-  $options = [];
-  $context = [
-    'magic' => "13"
-  ];
-
-  $result = Sage::execute($schema, $document, $context, $options);
-
-  $output = $result->toArray();
-} catch (Exception $e) {
-  $output = [
-    'errors' => [
+    $result = Sage::execute(
+      $schema,
+      $document,
       [
-        'message' => $e->getMessage()
-      ]
-    ]
-  ];
+        'magic' => '13',
+      ],
+      []
+    );
+
+    $output = $result->toArray();
+} catch (Exception $e) {
+    $output = [
+        'errors' => [
+            [
+                'message' => $e->getMessage(),
+            ],
+        ],
+    ];
 }
 
 header('Content-Type: application/json');
