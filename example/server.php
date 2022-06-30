@@ -3,8 +3,8 @@
 // for a simpler autoloading using Loom.
 require '__loom.php';
 
+// ? define schema in another file, just import to use
 require 'schema.php';
-require 'data.php';
 
 use Exception;
 use Sage\Sage;

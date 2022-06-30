@@ -5,37 +5,19 @@ declare(strict_types=1);
 namespace Sage\Type;
 
 use Generator;
-use Sage\Sage;
-use Traversable;
-use function implode;
-use function sprintf;
-use Sage\Error\Error;
-use Sage\Utils\Utils;
 use function is_array;
-use Sage\Utils\TypeInfo;
 use function is_callable;
-use function array_values;
-use Sage\Type\Definition\Type;
-use Sage\Type\Definition\Entity;
+use Sage\Error\Error;
 use Sage\Error\InvariantViolation;
-use Sage\Type\Definition\Directive;
+use Sage\Type\Definition\Entity;
+use Sage\Type\Definition\Type;
+use Sage\Utils\TypeInfo;
+use Sage\Utils\Utils;
+use function sprintf;
+use Traversable;
 
 /**
- * Schema Definition
- *
- * A Schema is created by supplying the map of Entity types and their names:
- * A schema definition is then supplied to the validator and executor.
- * Usage Example:
- *
- *     $schema = new Sage\Type\Schema([
- *       'query' => $MyAppQueryRootType,
- *       'mutation' => $MyAppMutationRootType,
- *     ]);
- *
- * Or giving types programmaticly:
- *
- *   $schema = new Sage\Type\Schema();
- *   $schema->addEntityType($name, $UserEntityType);
+ * Schema Definition.
  */
 class Schema
 {
@@ -58,32 +40,21 @@ class Schema
      */
     public function entityType(string $name)
     {
-        return (array_key_exists($name, $this->types))
-      ? $this->types[$name]
-      : null;
+        return array_key_exists($name, $this->types)
+          ? $this->types[$name]
+          : null;
     }
 
     /**
      * @param string $name
-     * @param Entity $type
      *
      * @return void
      *
      * @api
      */
-    public function addEntityType(Entity $type)
+    public function newEntityType(Entity $type)
     {
         $this->types[$type->name] = $type;
-    }
-
-    /**
-     * @return EntityType|null
-     *
-     * @api
-     */
-    public function removeEntityType(string $name)
-    {
-        unset($this->types[$name]);
     }
 
     /**
@@ -97,8 +68,6 @@ class Schema
     }
 
     /**
-     * @param callable $typeLoader
-     *
      * @return void
      *
      * @api
@@ -110,7 +79,7 @@ class Schema
 
     public function assumeValid(?bool $value = null)
     {
-        if ($value === null) {
+        if (null === $value) {
             return $this->assumeValid;
         }
 
@@ -118,13 +87,13 @@ class Schema
     }
 
     /**
-     * @param mixed[]|SchemaConfig $entityTypes
-     *
      * @api
+     *
+     * @param Type[] $types
      */
-    public function __construct($entityTypes)
+    public function __construct(array $types)
     {
-        # Create schema from array
+        // Create schema from array
         if (is_array($config)) {
             $config = static::create($config);
         }
@@ -157,15 +126,15 @@ class Schema
              */
         }
 
-        if ($config->query !== null) {
+        if (null !== $config->query) {
             $this->resolvedTypes[$config->query->name] = $config->query;
         }
 
-        if ($config->mutation !== null) {
+        if (null !== $config->mutation) {
             $this->resolvedTypes[$config->mutation->name] = $config->mutation;
         }
 
-        if ($config->subscription !== null) {
+        if (null !== $config->subscription) {
             $this->resolvedTypes[$config->subscription->name] = $config->subscription;
         }
 
@@ -184,14 +153,14 @@ class Schema
             }
         }
 
-        $this->resolvedTypes += Type::getStandardTypes() + Introspection::getTypes();
+        $this->resolvedTypes += Type::getStandardTypes() + Introspection::types();
 
         if ($this->config->typeLoader) {
             return;
         }
 
         // Perform full scan of the schema
-        $this->getTypeMap();
+        $this->typeMap();
     }
 
     /**
@@ -206,20 +175,13 @@ class Schema
         }
 
         if (!is_array($types) && !$types instanceof Traversable) {
-            throw new InvariantViolation(sprintf(
-                'Schema types callable must return array or instance of Traversable but got: %s',
-                Utils::getVariableType($types)
-            ));
+            throw new InvariantViolation(sprintf('Schema types callable must return array or instance of Traversable but got: %s', Utils::getVariableType($types)));
         }
 
         foreach ($types as $index => $type) {
             $type = self::resolveType($type);
             if (!$type instanceof Type) {
-                throw new InvariantViolation(sprintf(
-                    'Each entry of schema types must be instance of Sage\Type\Definition\Type but entry at %s is %s',
-                    $index,
-                    Utils::printSafe($type)
-                ));
+                throw new InvariantViolation(sprintf('Each entry of schema types must be instance of Sage\Type\Definition\Type but entry at %s is %s', $index, Utils::printSafe($type)));
             }
             yield $type;
         }
@@ -227,7 +189,7 @@ class Schema
 
     /**
      * Returns array of all types in this schema. Keys of this array represent type names, values are instances
-     * of corresponding type definitions
+     * of corresponding type definitions.
      *
      * This operation requires full schema scan. Do not use in production environment.
      *
@@ -235,11 +197,11 @@ class Schema
      *
      * @api
      */
-    public function getTypeMap()
+    public function typeMap()
     {
         if (!$this->fullyLoaded) {
             $this->resolvedTypes = $this->collectAllTypes();
-            $this->fullyLoaded   = true;
+            $this->fullyLoaded = true;
         }
 
         return $this->resolvedTypes;
@@ -267,11 +229,11 @@ class Schema
     }
 
     /**
-     * Returns type by its name
+     * Returns type by its name.
      *
      * @api
      */
-    public function getType(string $name): ?Type
+    public function type(string $name): ?Type
     {
         if (!isset($this->resolvedTypes[$name])) {
             $type = $this->loadType($name);
@@ -287,7 +249,7 @@ class Schema
 
     public function hasType(string $name): bool
     {
-        return $this->getType($name) !== null;
+        return null !== $this->type($name);
     }
 
     private function loadType(string $typeName): ?Type
@@ -320,9 +282,7 @@ class Schema
         }
 
         if ($type->name !== $typeName) {
-            throw new InvariantViolation(
-                sprintf('Type loader is expected to return type "%s", but it returned "%s"', $typeName, $type->name)
-            );
+            throw new InvariantViolation(sprintf('Type loader is expected to return type "%s", but it returned "%s"', $typeName, $type->name));
         }
 
         return $type;
@@ -330,19 +290,13 @@ class Schema
 
     protected function throwNotAType($type, string $typeName)
     {
-        throw new InvariantViolation(
-            sprintf(
-                'Type loader is expected to return a callable or valid type "%s", but it returned %s',
-                $typeName,
-                Utils::printSafe($type)
-            )
-        );
+        throw new InvariantViolation(sprintf('Type loader is expected to return a callable or valid type "%s", but it returned %s', $typeName, Utils::printSafe($type)));
     }
 
     private function defaultTypeLoader(string $typeName): ?Type
     {
         // Default type loader simply falls back to collecting all types
-        $typeMap = $this->getTypeMap();
+        $typeMap = $this->typeMap();
 
         return $typeMap[$typeName] ?? null;
     }
@@ -357,74 +311,5 @@ class Schema
         }
 
         return $type();
-    }
-
-    /**
-     * Validates schema.
-     *
-     * This operation requires full schema scan. Do not use in production environment.
-     *
-     * @throws InvariantViolation
-     *
-     * @api
-     */
-    public function assertValid()
-    {
-        $errors = $this->validate();
-
-        if ($errors) {
-            throw new InvariantViolation(implode("\n\n", $this->validationErrors));
-        }
-
-        $internalTypes = Type::standardTypes();
-        foreach ($this->getTypeMap() as $name => $type) {
-            if (isset($internalTypes[$name])) {
-                continue;
-            }
-
-            $type->assertValid();
-
-            //* Make sure type loader returns the same instance as registered in other places of schema
-            if (!$this->config->typeLoader) {
-                continue;
-            }
-
-            Utils::invariant(
-                $this->loadType($name) === $type,
-                sprintf(
-                    'Type loader returns different instance for %s than field/argument definitions. Make sure you always return the same instance for the same type name.',
-                    $name
-                )
-            );
-        }
-    }
-
-    /**
-     * Validates schema.
-     *
-     * ! This operation requires full schema scan. Do not use in production environment.
-     *
-     * @return InvariantViolation[]|Error[]
-     *
-     * @api
-     */
-    public function validate()
-    {
-        // If this Schema has already been validated, return the previous results.
-        if ($this->validationErrors !== null) {
-            return $this->validationErrors;
-        }
-
-        // Validate the schema, producing a list of errors.
-        $context = new SchemaValidationContext($this);
-        $context->validateTypes();
-
-        /*
-         ? Persist the results of validation before returning to ensure validation
-         ? does not run multiple times for this schema.
-         */
-        $this->validationErrors = $context->getErrors();
-
-        return $this->validationErrors;
     }
 }

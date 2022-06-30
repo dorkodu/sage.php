@@ -11,8 +11,8 @@ class TypeLibrary
 {
     /** @var array<string, Entity> */
     private static array $entities = [
-    '' => new Entity([]),
-  ];
+      '' => new Entity([]),
+    ];
 
     /** @var array<string, Attribute> */
     private static array $attributes = [];

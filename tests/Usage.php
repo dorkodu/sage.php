@@ -20,35 +20,35 @@ class Usage extends TestCase
         $schema = new Schema(['Person' => $Person]);
         //? Attributes
         $name = new Attribute([
-      'name' => 'name',
-      'description' => 'Name of a User.',
-      'resolve' => function ($referenceValue, ContextInfo $info) {
-          $id = $referenceValue['userId'];
-          $user = DataSource::getUserById($id);
-          return $user->email;
-      }
-    ]);
+          'name' => 'name',
+          'description' => 'Name of a User.',
+          'resolve' => function ($referenceValue, ContextInfo $info) {
+              $id = $referenceValue['userId'];
+              $user = DataSource::getUserById($id);
+              return $user->email;
+          }
+        ]);
 
         $email = new Attribute([
-      'name' => 'email',
-      'description' => 'Email of a User.',
-      'resolve' => function ($referenceValue, ContextInfo $info) {
-          $id = $referenceValue['userId'];
-          $user = DataSource::getUserById($id);
-          return $user->email;
-      }
-    ]);
+          'name' => 'email',
+          'description' => 'Email of a User.',
+          'resolve' => function ($referenceValue, ContextInfo $info) {
+              $id = $referenceValue['userId'];
+              $user = DataSource::getUserById($id);
+              return $user->email;
+          }
+        ]);
 
         //? Entities
         $User = new Entity([
-      'name' => "User",
-      'description' => "Represents a user of the app.",
-      'attributes' => [
-        'name' => $name
-      ],
-      'acts' => [],
-      'links' => [],
-    ]);
+          'name' => "User",
+          'description' => "Represents a user of the app.",
+          'attributes' => [
+            'name' => $name
+          ],
+          'acts' => [],
+          'links' => [],
+        ]);
 
         $Note = new Entity([
       'name' => 'Note',
