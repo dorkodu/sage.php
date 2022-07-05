@@ -6,7 +6,7 @@ $universalNamespaces = [
   'Sage'      => './../../source',
   'Sage\Test' => './',
   'Dorkodu'   => 'loot/Dorkodu',
-  'Blog'      => 'loot/Blog',
+  'PinkFloyd' => 'loot/PinkFloyd',
 ];
 
 $psr4Autoloader = new Psr4Autoloader();
