@@ -14,22 +14,22 @@ $input = json_decode($rawInput, true);
 
 try {
     $result = Sage::execute(
-      $schema,
-      $document,
-      [
-        'magic' => '13',
-      ],
-      []
+        $schema,
+        $document,
+        [
+          'author' => 'doruk eray',
+        ],
+        []
     );
 
     $output = $result->toArray();
 } catch (Exception $e) {
     $output = [
-        'errors' => [
-            [
-                'message' => $e->getMessage(),
-            ],
+      'errors' => [
+        [
+          'message' => $e->getMessage(),
         ],
+      ],
     ];
 }
 
