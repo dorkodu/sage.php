@@ -4,6 +4,7 @@ namespace Sage\Validate\Contracts;
 
 class SchemaContract
 {
+<<<<<<< Updated upstream
 
    /** @var array<int, Error> */
    private array $errors = [];
@@ -1045,6 +1046,8 @@ class SchemaContract
        }
    }
    
+=======
+>>>>>>> Stashed changes
     /**
      * Validation rules for a Sage schema.
      *
