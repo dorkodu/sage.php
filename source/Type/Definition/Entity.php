@@ -13,9 +13,9 @@ use function is_callable;
 use function sprintf;
 
 /**
- * Entity Type Definition
+ * Entity Definition
  *
- * Almost all of the Sage types you define will be Entity types.
+ * Almost everything you define will be Entity types.
  * Entities are composite types, which contain artifacts (attributes, acts and links).
  *
  * Example:
@@ -28,230 +28,235 @@ use function sprintf;
  *     ]
  *   ]);
  */
-class Entity extends Type
+class Entity
 {
-  /** @var callable */
-  public $resolve;
+    /** @var string */
+    public $name;
 
-  /** @var Attribute[] */
-  public $attributes;
+    /** @var string|null */
+    public $description;
 
-  /** @var Act[] */
-  public $acts;
+    /** @var callable */
+    public $resolve;
 
-  /** @var Link[] */
-  public $links;
+    /** @var Attribute[] */
+    public $attributes;
 
-  /** @var bool */
-  public $deprecated = false;
+    /** @var Act[] */
+    public $acts;
 
-  /** @var string|null */
-  public $deprecationReason;
+    /** @var Link[] */
+    public $links;
 
-  /**
-   * Original type definition configuration
-   *
-   * @var array
-   */
-  public $config;
+    /** @var bool */
+    public $deprecated = false;
 
-  /**
-   * @param mixed[] $config
-   */
-  public function __construct(array $config)
-  {
-    $this->name              = $config['name'];
-    $this->description       = $config['description'] ?? null;
-    $this->deprecationReason = $config['deprecationReason'] ?? null;
-    $this->deprecated        = $config['deprecated'] ?? (isset($config['deprecationReason']) ? true : false);
+    /** @var string|null */
+    public $deprecationReason;
 
-    $this->resolve = $config['resolve'] ?? null;
+    /**
+     * Original type definition configuration
+     *
+     * @var array
+     */
+    public $settings;
 
-    $this->config = $config;
+    /**
+     * @param mixed[] $settings
+     */
+    public function __construct(array $settings)
+    {
+        $this->name              = $settings['name'];
+        $this->description       = $settings['description'] ?? null;
+        $this->deprecationReason = $settings['deprecationReason'] ?? null;
+        $this->deprecated        = $settings['deprecated'] ?? (isset($settings['deprecationReason']) ? true : false);
 
-    $this->attributes = $config['attributes'] ?? [];
-    $this->acts = $config['acts'] ?? [];
-    $this->links = $config['links'] ?? [];
-  }
+        $this->resolve = $settings['resolve'] ?? null;
 
-  /**
-   * @param mixed $type
-   *
-   * @return $this
-   *
-   * @throws InvariantViolation
-   */
-  public static function assertEntityType($type)
-  {
-    Utils::invariant(
-      $type instanceof self,
-      'Expected ' . Utils::printSafe($type) . ' to be a Sage Entity type.'
-    );
-  }
+        $this->config = $settings;
 
-  /**
-   * @throws InvariantViolation
-   */
-  public function attribute(string $name): Attribute
-  {
-    Utils::invariant(
-      isset($this->attributes[$name]),
-      'Attribute "%s" is not defined for Entity "%s"',
-      $name,
-      $this->name
-    );
-
-    return $this->attributes[$name];
-  }
-
-  /**
-   * @throws InvariantViolation
-   */
-  public function act(string $name): Act
-  {
-    Utils::invariant(
-      isset($this->acts[$name]),
-      'Act "%s" is not defined for Entity "%s"',
-      $name,
-      $this->name
-    );
-
-    return $this->acts[$name];
-  }
-
-  /**
-   * @throws InvariantViolation
-   */
-  public function link(string $name): Link
-  {
-    Utils::invariant(
-      isset($this->links[$name]),
-      'Link "%s" is not defined for Entity "%s"',
-      $name,
-      $this->name
-    );
-
-    return $this->links[$name];
-  }
-
-  /**
-   * @param string $name
-   * @return boolean
-   */
-  public function hasAttribute(string $name): bool
-  {
-    return isset($this->attributes[$name]);
-  }
-
-  /**
-   * @param string $name
-   * @return boolean
-   */
-  public function hasAct(string $name)
-  {
-    return isset($this->acts[$name]);
-  }
-
-  /**
-   * @param string $name
-   * @return boolean
-   */
-  public function hasLink(string $name)
-  {
-    return isset($this->links[$name]);
-  }
-
-  /**
-   * Validates type configuration and throws if one of options is invalid.
-   *
-   * @throws InvariantViolation
-   * 
-   * @return void
-   */
-  public function assertValid()
-  {
-    parent::assertValid();
-
-    //? Assert: all resolver function is valid. 
-    $this->assertResolveIsValid();
-
-    //? Assert: all artifacts are valid.
-    $this->assertAttributesAreValid();
-    $this->assertActsAreValid();
-    $this->assertLinksAreValid();
-  }
-
-  public function assertResolveIsValid()
-  {
-    //? Assert: resolve is a callable
-    Utils::invariant(
-      is_callable($this->resolve),
-      sprintf(
-        '%s - Entity resolver must be a function returning a reference value map, but got: %s',
-        $this->name,
-        Utils::printSafe($this->resolve)
-      )
-    );
-  }
-
-  public function assertAttributesAreValid()
-  {
-    //? Assert: all attributes are valid.
-    foreach ($this->attributes as $name => $attribute) {
-
-      Utils::invariant(
-        $attribute instanceof Attribute,
-        "%s - 'attributes' must be a map of Attribute instances as values, but contains invalid item(s).",
-        $this->name
-      );
-
-      Utils::invariant(
-        is_string($name),
-        "%s - 'attributes' must be a map of string names as keys, but contains invalid key(s).",
-        $this->name
-      );
-
-      $attribute->assertValid($this);
+        $this->attributes = $settings['attributes'] ?? [];
+        $this->acts = $settings['acts'] ?? [];
+        $this->links = $settings['links'] ?? [];
     }
-  }
 
-  public function assertActsAreValid()
-  {
-    //? Assert: all acts are valid.
-    foreach ($this->acts as $name => $act) {
-      Utils::invariant(
-        $act instanceof Act,
-        "%s - 'acts' must be a map of Act instances as values, but contains invalid item(s).",
-        $this->name
-      );
-
-      Utils::invariant(
-        is_string($name),
-        "%s - 'acts' must be a map of string names as keys, but contains invalid key(s).",
-        $this->name
-      );
-
-      $act->assertValid($this);
+    /**
+     * @param mixed $type
+     *
+     * @return $this
+     *
+     * @throws InvariantViolation
+     */
+    public static function assertEntityType($type)
+    {
+        Utils::invariant(
+            $type instanceof self,
+            'Expected ' . Utils::printSafe($type) . ' to be a Sage Entity type.'
+        );
     }
-  }
 
-  public function assertLinksAreValid()
-  {
-    //? Assert: all links are valid.
-    foreach ($this->links as $name => $link) {
-      Utils::invariant(
-        $link instanceof Link,
-        "%s - 'links' must be a map of Link instances as values, but contains invalid item(s).",
-        $this->name
-      );
+    /**
+     * @throws InvariantViolation
+     */
+    public function attribute(string $name): Attribute
+    {
+        Utils::invariant(
+            isset($this->attributes[$name]),
+            'Attribute "%s" is not defined for Entity "%s"',
+            $name,
+            $this->name
+        );
 
-      Utils::invariant(
-        is_string($name),
-        "%s - 'links' must be a map of string names as keys, but contains invalid key(s).",
-        $this->name
-      );
-
-      $link->assertValid($this);
+        return $this->attributes[$name];
     }
-  }
+
+    /**
+     * @throws InvariantViolation
+     */
+    public function act(string $name): Act
+    {
+        Utils::invariant(
+            isset($this->acts[$name]),
+            'Act "%s" is not defined for Entity "%s"',
+            $name,
+            $this->name
+        );
+
+        return $this->acts[$name];
+    }
+
+    /**
+     * @throws InvariantViolation
+     */
+    public function link(string $name): Link
+    {
+        Utils::invariant(
+            isset($this->links[$name]),
+            'Link "%s" is not defined for Entity "%s"',
+            $name,
+            $this->name
+        );
+
+        return $this->links[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public function hasAttribute(string $name): bool
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public function hasAct(string $name)
+    {
+        return isset($this->acts[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public function hasLink(string $name)
+    {
+        return isset($this->links[$name]);
+    }
+
+    /**
+     * Validates type configuration and throws if one of options is invalid.
+     *
+     * @throws InvariantViolation
+     *
+     * @return void
+     */
+    public function assertValid()
+    {
+        parent::assertValid();
+
+        //? Assert: all resolver function is valid.
+        $this->assertResolveIsValid();
+
+        //? Assert: all artifacts are valid.
+        $this->assertAttributesAreValid();
+        $this->assertActsAreValid();
+        $this->assertLinksAreValid();
+    }
+
+    public function assertResolveIsValid()
+    {
+        //? Assert: resolve is a callable
+        Utils::invariant(
+            is_callable($this->resolve),
+            sprintf(
+                '%s - Entity resolver must be a function returning a reference value map, but got: %s',
+                $this->name,
+                Utils::printSafe($this->resolve)
+            )
+        );
+    }
+
+    public function assertAttributesAreValid()
+    {
+        //? Assert: all attributes are valid.
+        foreach ($this->attributes as $name => $attribute) {
+            Utils::invariant(
+                $attribute instanceof Attribute,
+                "%s - 'attributes' must be a map of Attribute instances as values, but contains invalid item(s).",
+                $this->name
+            );
+
+            Utils::invariant(
+                is_string($name),
+                "%s - 'attributes' must be a map of string names as keys, but contains invalid key(s).",
+                $this->name
+            );
+
+            $attribute->assertValid($this);
+        }
+    }
+
+    public function assertActsAreValid()
+    {
+        //? Assert: all acts are valid.
+        foreach ($this->acts as $name => $act) {
+            Utils::invariant(
+                $act instanceof Act,
+                "%s - 'acts' must be a map of Act instances as values, but contains invalid item(s).",
+                $this->name
+            );
+
+            Utils::invariant(
+                is_string($name),
+                "%s - 'acts' must be a map of string names as keys, but contains invalid key(s).",
+                $this->name
+            );
+
+            $act->assertValid($this);
+        }
+    }
+
+    public function assertLinksAreValid()
+    {
+        //? Assert: all links are valid.
+        foreach ($this->links as $name => $link) {
+            Utils::invariant(
+                $link instanceof Link,
+                "%s - 'links' must be a map of Link instances as values, but contains invalid item(s).",
+                $this->name
+            );
+
+            Utils::invariant(
+                is_string($name),
+                "%s - 'links' must be a map of string names as keys, but contains invalid key(s).",
+                $this->name
+            );
+
+            $link->assertValid($this);
+        }
+    }
 }

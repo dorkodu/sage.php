@@ -8,28 +8,33 @@ require 'schema.php';
 
 use Exception;
 use Sage\Sage;
+use Sage\Type\Schema;
 
 $rawInput = file_get_contents('php://input');
 $input = json_decode($rawInput, true);
 
 try {
     $result = Sage::execute(
-      $schema,
-      $document,
-      [
-        'magic' => '13',
-      ],
-      []
+        $schema,
+        $document,
+        [
+          'author' => 'doruk eray',
+        ],
+        [
+          'onError' => function () {
+              # code
+          }
+        ]
     );
 
     $output = $result->toArray();
 } catch (Exception $e) {
     $output = [
-        'errors' => [
-            [
-                'message' => $e->getMessage(),
-            ],
+      'errors' => [
+        [
+          'message' => $e->getMessage(),
         ],
+      ],
     ];
 }
 

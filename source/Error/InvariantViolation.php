@@ -8,13 +8,10 @@ use LogicException;
 
 /**
  * Note:
- * This exception should not inherit base Error exception as it is raised when there is an error somewhere in
- * user-land code
+ * This exception should not inherit base Error exception 
+ * as it is raised when there is an error somewhere in user-land code.
  */
 class InvariantViolation extends LogicException
 {
-  public static function shouldNotHappen(): self
-  {
-    return new self('This should not have happened');
-  }
+
 }

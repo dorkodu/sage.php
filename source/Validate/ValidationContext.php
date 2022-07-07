@@ -26,7 +26,7 @@ use Sage\Validator\ASTValidationContext;
  * allowing access to commonly useful contextual information from within a
  * validation rule.
  */
-class ValidationContext extends SourceValidationContext
+class ValidationContext
 {
     /** @var TypeInfo */
     private $typeInfo;

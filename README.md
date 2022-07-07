@@ -9,12 +9,14 @@ See the documentation at **[/docs](./docs)**.
 
 > #### `Note`
 >
-> The Sage.php project is a *work-in-progress*. 
+> The **Sage.php** project is a *work-in-progress*. 
 > Code and documentation are currently under development and are subject to change.
 
 ## Getting Started
 
-A general overview of Sage is available on the [website](https://libre.dorkodu.com/sage). That overview describes a simple set of Sage examples that exist as [tests](test) in this repository. A good way to get started with Sage is the [official documentation](https://libre.dorkodu.com/sage/learn).
+A general overview of Sage is available on the [website](https://libre.dorkodu.com/sage). 
+That overview describes a simple set of Sage examples that exist as [tests](test) in this repository. 
+A good way to get started with Sage is the [official documentation](https://libre.dorkodu.com/sage/learn).
 
 ### Installation
 
@@ -26,7 +28,7 @@ We welcome your contributions, even if it is just a simple idea.
 
 ## Author
 
-Doruk Eray — [GitHub](https://github.com/dorukeray) **·** [Twitter](https://twitter.com/doruk4ever) **·** [doruk@dorkodu.com](mailto:doruk@dorkodu.com) **·** [doruk.dorkodu.com](https://doruk.dorkodu.com)
+**Doruk Eray** — [GitHub](https://github.com/dorukeray) **·** [Twitter](https://twitter.com/dorukeray_) **·** [Website](https://doruk.dorkodu.com) · [doruk@dorkodu.com](mailto:doruk@dorkodu.com) 
 
 See also some of our [contributions](https://libre.dorkodu.com) that we are making at [Dorkodu](https://dorkodu.com) to the open source software community.
 

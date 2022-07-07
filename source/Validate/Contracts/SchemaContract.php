@@ -1,44 +1,13 @@
 <?php
 
-declare(strict_types=1);
+namespace Sage\Validate\Contracts;
 
-namespace Sage\Type;
-
-use Sage\Error\Error;
-use Sage\Type\Definition\Directive;
-use Sage\Type\Definition\EnumType;
-use Sage\Type\Definition\EnumValueDefinition;
-use Sage\Type\Definition\FieldDefinition;
-use Sage\Type\Definition\ImplementingType;
-use Sage\Type\Definition\InputObjectField;
-use Sage\Type\Definition\InputObjectType;
-use Sage\Type\Definition\InterfaceType;
-use Sage\Type\Definition\NamedType;
-use Sage\Type\Definition\ObjectType;
-use Sage\Type\Definition\ScalarType;
-use Sage\Type\Definition\Type;
-use Sage\Type\Definition\UnionType;
-use Sage\Type\Validation\InputObjectCircularRefs;
-use Sage\Utils\TypeComparators;
-use Sage\Utils\Utils;
-
-use function array_filter;
-use function array_key_exists;
-use function array_merge;
-use function count;
-use function in_array;
-use function is_array;
-use function is_object;
-use function sprintf;
-
-class SchemaValidationContext
+class SchemaContract
 {
     /** @var array<int, Error> */
     private array $errors = [];
 
     private Schema $schema;
-
-    private InputObjectCircularRefs $inputObjectCircularRefs;
 
     public function __construct(Schema $schema)
     {
@@ -103,102 +72,8 @@ class SchemaValidationContext
         }
 
         return $operationTypeNode === null
-            ? ($type === null ? null : $type->astNode)
-            : $operationTypeNode->type;
-    }
-
-    public function validateDirectives(): void
-    {
-        $this->validateDirectiveDefinitions();
-
-        // Validate directives that are used on the schema
-        $this->validateDirectivesAtLocation(
-            $this->getDirectives($this->schema),
-            DirectiveLocation::SCHEMA
-        );
-    }
-
-    public function validateDirectiveDefinitions(): void
-    {
-        $directiveDefinitions = [];
-
-        $directives = $this->schema->getDirectives();
-        foreach ($directives as $directive) {
-            // Ensure all directives are in fact Sage directives.
-            if (! $directive instanceof Directive) {
-                $nodes = is_object($directive)
-                    ? $directive->astNode
-                    : null;
-
-                $this->reportError(
-                    'Expected directive but got: ' . Utils::printSafe($directive) . '.',
-                    $nodes
-                );
-                continue;
-            }
-
-            $existingDefinitions                    = $directiveDefinitions[$directive->name] ?? [];
-            $existingDefinitions[]                  = $directive;
-            $directiveDefinitions[$directive->name] = $existingDefinitions;
-
-            // Ensure they are named correctly.
-            $this->validateName($directive);
-
-            // TODO: Ensure proper locations.
-
-            $argNames = [];
-            foreach ($directive->args as $arg) {
-                // Ensure they are named correctly.
-                $this->validateName($arg);
-
-                $argName = $arg->name;
-
-                if (isset($argNames[$argName])) {
-                    $this->reportError(
-                        sprintf('Argument @%s(%s:) can only be defined once.', $directive->name, $argName),
-                        $this->getAllDirectiveArgNodes($directive, $argName)
-                    );
-                    continue;
-                }
-
-                $argNames[$argName] = true;
-
-                // Ensure the type is an input type.
-                if (Type::isInputType($arg->getType())) {
-                    continue;
-                }
-
-                $this->reportError(
-                    sprintf(
-                        'The type of @%s(%s:) must be Input Type but got: %s.',
-                        $directive->name,
-                        $argName,
-                        Utils::printSafe($arg->getType())
-                    ),
-                    $this->getDirectiveArgTypeNode($directive, $argName)
-                );
-            }
-        }
-
-        foreach ($directiveDefinitions as $directiveName => $directiveList) {
-            if (count($directiveList) <= 1) {
-                continue;
-            }
-
-            $nodes = [];
-            foreach ($directiveList as $dir) {
-                if ($dir->astNode === null) {
-                    continue;
-                }
-
-                $nodes[] = $dir->astNode;
-            }
-
-            $this->reportError(
-                sprintf('Directive @%s defined multiple times.', $directiveName),
-                $nodes
-            );
-        }
+           ? ($type === null ? null : $type->astNode)
+           : $operationTypeNode->type;
     }
 
     /**
@@ -215,40 +90,7 @@ class SchemaValidationContext
         $this->addError($error);
     }
 
-    /**
-     * @return array<int, InputValueDefinitionNode>
-     */
-    private function getAllDirectiveArgNodes(Directive $directive, string $argName): array
-    {
-        $subNodes = $this->getAllSubNodes(
-            $directive,
-            /**
-             * @return NodeList<InputValueDefinitionNode>
-             */
-            static function (DirectiveDefinitionNode $directiveNode): NodeList {
-                return $directiveNode->arguments;
-            }
-        );
-
-        return Utils::filter(
-            $subNodes,
-            static function (InputValueDefinitionNode $argNode) use ($argName): bool {
-                return $argNode->name->value === $argName;
-            }
-        );
-    }
-
-    /**
-     * @return NamedTypeNode|ListTypeNode|NonNullTypeNode|null
-     */
-    private function getDirectiveArgTypeNode(Directive $directive, string $argName): ?TypeNode
-    {
-        $argNode = $this->getAllDirectiveArgNodes($directive, $argName)[0] ?? null;
-
-        return $argNode === null ? null : $argNode->type;
-    }
-
-    public function validateTypes(): void
+    public function validateEntities(): void
     {
         $typeMap = $this->schema->getTypeMap();
         foreach ($typeMap as $typeName => $type) {
@@ -356,8 +198,8 @@ class SchemaValidationContext
             );
             if (! $includes) {
                 $errorNodes = $schemaDirective->astNode === null
-                    ? [$directive]
-                    : [$directive, $schemaDirective->astNode];
+                   ? [$directive]
+                   : [$directive, $schemaDirective->astNode];
                 $this->reportError(
                     sprintf('Directive @%s not allowed at %s location.', $directiveName, $location),
                     $errorNodes
@@ -505,8 +347,8 @@ class SchemaValidationContext
         }
 
         return $astNode !== null
-            ? array_merge([$astNode], $extensionNodes)
-            : $extensionNodes;
+           ? array_merge([$astNode], $extensionNodes)
+           : $extensionNodes;
     }
 
     /**
@@ -541,13 +383,13 @@ class SchemaValidationContext
     {
         $subNodes = $this->getAllSubNodes(
             $type,
-            /**
-             * @return NodeList<FieldDefinitionNode>
-             */
-            static function (Node $typeNode): NodeList {
-                /** @var ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeNode */
-                return $typeNode->fields;
-            }
+           /**
+            * @return NodeList<FieldDefinitionNode>
+            */
+           static function (Node $typeNode): NodeList {
+               /** @var ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeNode */
+               return $typeNode->fields;
+           }
         );
 
         return Utils::filter($subNodes, static function ($fieldNode) use ($fieldName): bool {
@@ -565,8 +407,8 @@ class SchemaValidationContext
         $fieldNode = $this->getFieldNode($type, $fieldName);
 
         return $fieldNode === null
-            ? null
-            : $fieldNode->type;
+           ? null
+           : $fieldNode->type;
     }
 
     /**
@@ -611,8 +453,8 @@ class SchemaValidationContext
         $fieldArgNode = $this->getFieldArgNode($type, $fieldName, $argName);
 
         return $fieldArgNode === null
-            ? null
-            : $fieldArgNode->type;
+           ? null
+           : $fieldArgNode->type;
     }
 
     /**
@@ -679,13 +521,13 @@ class SchemaValidationContext
     {
         return $this->getAllSubNodes(
             $object,
-            /**
-             * @return NodeList<DirectiveNode>
-             */
-            static function (Node $node): NodeList {
-                /** @var SchemaDefinitionNode|SchemaTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|ScalarTypeDefinitionNode|ScalarTypeExtensionNode $node */
-                return $node->directives;
-            }
+           /**
+            * @return NodeList<DirectiveNode>
+            */
+           static function (Node $node): NodeList {
+               /** @var SchemaDefinitionNode|SchemaTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|ScalarTypeDefinitionNode|ScalarTypeExtensionNode $node */
+               return $node->directives;
+           }
         );
     }
 
@@ -708,13 +550,13 @@ class SchemaValidationContext
     {
         $subNodes = $this->getAllSubNodes(
             $type,
-            /**
-             * @return NodeList<NamedTypeNode>
-             */
-            static function (Node $typeNode): NodeList {
-                /** @var ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeNode */
-                return $typeNode->interfaces;
-            }
+           /**
+            * @return NodeList<NamedTypeNode>
+            */
+           static function (Node $typeNode): NodeList {
+               /** @var ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeNode */
+               return $typeNode->interfaces;
+           }
         );
 
         return Utils::filter($subNodes, static function (NamedTypeNode $ifaceNode) use ($shouldBeInterface): bool {
@@ -733,8 +575,8 @@ class SchemaValidationContext
         // Assert each interface field is implemented.
         foreach ($ifaceFieldMap as $fieldName => $ifaceField) {
             $typeField = array_key_exists($fieldName, $typeFieldMap)
-                ? $typeFieldMap[$fieldName]
-                : null;
+               ? $typeFieldMap[$fieldName]
+               : null;
 
             // Assert interface field exists on type.
             if ($typeField === null) {
@@ -756,12 +598,12 @@ class SchemaValidationContext
             // Assert interface field type is satisfied by type field type, by being
             // a valid subtype. (covariant)
             if (
-                ! TypeComparators::isTypeSubTypeOf(
-                    $this->schema,
-                    $typeField->getType(),
-                    $ifaceField->getType()
-                )
-            ) {
+               ! TypeComparators::isTypeSubTypeOf(
+                   $this->schema,
+                   $typeField->getType(),
+                   $ifaceField->getType()
+               )
+           ) {
                 $this->reportError(
                     sprintf(
                         'Interface field %s.%s expects type %s but %s.%s is type %s.',
@@ -773,9 +615,9 @@ class SchemaValidationContext
                         Utils::printSafe($typeField->getType())
                     ),
                     [
-                        $this->getFieldTypeNode($iface, $fieldName),
-                        $this->getFieldTypeNode($type, $fieldName),
-                    ]
+                       $this->getFieldTypeNode($iface, $fieldName),
+                       $this->getFieldTypeNode($type, $fieldName),
+                   ]
                 );
             }
 
@@ -803,9 +645,9 @@ class SchemaValidationContext
                             $fieldName
                         ),
                         [
-                            $this->getFieldArgNode($iface, $fieldName, $argName),
-                            $this->getFieldNode($type, $fieldName),
-                        ]
+                           $this->getFieldArgNode($iface, $fieldName, $argName),
+                           $this->getFieldNode($type, $fieldName),
+                       ]
                     );
                     continue;
                 }
@@ -827,9 +669,9 @@ class SchemaValidationContext
                             Utils::printSafe($typeArg->getType())
                         ),
                         [
-                            $this->getFieldArgTypeNode($iface, $fieldName, $argName),
-                            $this->getFieldArgTypeNode($type, $fieldName, $argName),
-                        ]
+                           $this->getFieldArgTypeNode($iface, $fieldName, $argName),
+                           $this->getFieldArgTypeNode($type, $fieldName, $argName),
+                       ]
                     );
                 }
 
@@ -862,9 +704,9 @@ class SchemaValidationContext
                         $fieldName
                     ),
                     [
-                        $this->getFieldArgNode($type, $fieldName, $argName),
-                        $this->getFieldNode($iface, $fieldName),
-                    ]
+                       $this->getFieldArgNode($type, $fieldName, $argName),
+                       $this->getFieldNode($iface, $fieldName),
+                   ]
                 );
             }
         }
@@ -882,17 +724,17 @@ class SchemaValidationContext
             }
 
             $error = $transitive === $type ?
-                sprintf(
-                    'Type %s cannot implement %s because it would create a circular reference.',
-                    $type->name,
-                    $iface->name
-                ) :
-                sprintf(
-                    'Type %s must implement %s because it is implemented by %s.',
-                    $type->name,
-                    $transitive->name,
-                    $iface->name
-                );
+               sprintf(
+                   'Type %s cannot implement %s because it would create a circular reference.',
+                   $type->name,
+                   $iface->name
+               ) :
+               sprintf(
+                   'Type %s must implement %s because it is implemented by %s.',
+                   $type->name,
+                   $transitive->name,
+                   $iface->name
+               );
             $this->reportError(
                 $error,
                 array_merge(
@@ -948,13 +790,13 @@ class SchemaValidationContext
     {
         $subNodes = $this->getAllSubNodes(
             $union,
-            /**
-             * @return NodeList<NamedTypeNode>
-             */
-            static function (Node $unionNode): NodeList {
-                /** @var UnionTypeDefinitionNode|UnionTypeExtensionNode $unionNode */
-                return $unionNode->types;
-            }
+           /**
+            * @return NodeList<NamedTypeNode>
+            */
+           static function (Node $unionNode): NodeList {
+               /** @var UnionTypeDefinitionNode|UnionTypeExtensionNode $unionNode */
+               return $unionNode->types;
+           }
         );
 
         return Utils::filter($subNodes, static function (NamedTypeNode $typeNode) use ($typeName): bool {
@@ -1013,14 +855,14 @@ class SchemaValidationContext
     {
         $subNodes = $this->getAllSubNodes(
             $enum,
-            /**
-             * @param EnumTypeDefinitionNode|EnumTypeExtensionNode $enumNode
-             *
-             * @return NodeList<EnumValueDefinitionNode>
-             */
-            static function (Node $enumNode): NodeList {
-                return $enumNode->values;
-            }
+           /**
+            * @param EnumTypeDefinitionNode|EnumTypeExtensionNode $enumNode
+            *
+            * @return NodeList<EnumValueDefinitionNode>
+            */
+           static function (Node $enumNode): NodeList {
+               return $enumNode->values;
+           }
         );
 
         return Utils::filter($subNodes, static function ($valueNode) use ($valueName): bool {
@@ -1056,8 +898,8 @@ class SchemaValidationContext
                         Utils::printSafe($field->getType())
                     ),
                     $field->astNode !== null
-                        ? $field->astNode->type
-                        : null
+                       ? $field->astNode->type
+                       : null
                 );
             }
 
@@ -1071,5 +913,143 @@ class SchemaValidationContext
                 DirectiveLocation::INPUT_FIELD_DEFINITION
             );
         }
+    }
+
+    /**
+     * Validation rules for a Sage schema.
+     *
+     * This operation requires full schema scan. Do not use in production environment.
+     *
+     * @throws InvariantViolation
+     *
+     * @api
+     */
+    public function assertValid()
+    {
+        $errors = $this->validate();
+
+        if ($errors) {
+            throw new InvariantViolation(implode("\n\n", $this->validationErrors));
+        }
+
+        $internalTypes = Type::standardTypes();
+        foreach ($this->getTypeMap() as $name => $type) {
+            if (isset($internalTypes[$name])) {
+                continue;
+            }
+
+            $type->assertValid();
+
+            // * Make sure type loader returns the same instance as registered in other places of schema
+            if (!$this->config->typeLoader) {
+                continue;
+            }
+
+            Utils::invariant(
+                $this->loadType($name) === $type,
+                sprintf(
+                    'Type loader returns different instance for %s than field/argument definitions. Make sure you always return the same instance for the same type name.',
+                    $name
+                )
+            );
+        }
+    }
+
+    /**
+     * Validates schema.
+     *
+     * ! This operation requires full schema scan. Do not use in production environment.
+     *
+     * @return InvariantViolation[]|Error[]
+     *
+     * @api
+     */
+    public function validate()
+    {
+        // If this Schema has already been validated, return the previous results.
+        if (null !== $this->validationErrors) {
+            return $this->validationErrors;
+        }
+
+        // Validate the schema, producing a list of errors.
+        $context = new SchemaValidationContext($this);
+        $context->validateTypes();
+
+        /*
+         ? Persist the results of validation before returning to ensure validation
+         ? does not run multiple times for this schema.
+         */
+        $this->validationErrors = $context->getErrors();
+
+        return $this->validationErrors;
+    }
+
+    /**
+     * Validation rules for a Sage schema.
+     *
+     * This operation requires full schema scan. Do not use in production environment.
+     *
+     * @throws InvariantViolation
+     *
+     * @api
+     */
+    public function assertValid()
+    {
+        $errors = $this->validate();
+
+        if ($errors) {
+            throw new InvariantViolation(implode("\n\n", $this->validationErrors));
+        }
+
+        $internalTypes = Type::standardTypes();
+        foreach ($this->getTypeMap() as $name => $type) {
+            if (isset($internalTypes[$name])) {
+                continue;
+            }
+
+            $type->assertValid();
+
+            // * Make sure type loader returns the same instance as registered in other places of schema
+            if (!$this->config->typeLoader) {
+                continue;
+            }
+
+            Utils::invariant(
+                $this->loadType($name) === $type,
+                sprintf(
+                    'Type loader returns different instance for %s than field/argument definitions. Make sure you always return the same instance for the same type name.',
+                    $name
+                )
+            );
+        }
+    }
+
+    /**
+     * Validates schema.
+     *
+     * ! This operation requires full schema scan. Do not use in production environment.
+     *
+     * @return InvariantViolation[]|Error[]
+     *
+     * @api
+     */
+    public function validate()
+    {
+        // If this Schema has already been validated, return the previous results.
+        if (null !== $this->validationErrors) {
+            return $this->validationErrors;
+        }
+
+        // Validate the schema, producing a list of errors.
+        $context = new SchemaValidationContext($this);
+        $context->validateTypes();
+
+        /*
+         ? Persist the results of validation before returning to ensure validation
+         ? does not run multiple times for this schema.
+         */
+        $this->validationErrors = $context->getErrors();
+
+        return $this->validationErrors;
     }
 }

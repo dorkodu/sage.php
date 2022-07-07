@@ -27,14 +27,14 @@ class Link extends Artifact
   public $linksTo;
 
   /**
-   * @param mixed[] $config
+   * @param mixed[] $settings
    */
-  public function __construct(array $config)
+  public function __construct(array $settings)
   {
-    parent::__construct($config);
+    parent::__construct($settings);
 
-    $this->linksTo = $config['linksTo'] ?? null;
-    $this->resolve = $config['resolve'] ?? null;
+    $this->linksTo = $settings['linksTo'] ?? null;
+    $this->resolve = $settings['resolve'] ?? null;
   }
 
   /**

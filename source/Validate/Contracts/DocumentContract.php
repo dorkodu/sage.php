@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Sage\Validator;
+namespace Sage\Validate;
 
 use function array_filter;
 use function array_merge;
@@ -13,40 +13,7 @@ use Sage\Document;
 use Sage\Error\Error;
 use Sage\Type\Schema;
 use Sage\Utils\TypeInfo;
-use Sage\Validator\Rules\DisableIntrospection;
-use Sage\Validator\Rules\ExecutableDefinitions;
-use Sage\Validator\Rules\FieldsOnCorrectType;
-use Sage\Validator\Rules\FragmentsOnCompositeTypes;
-use Sage\Validator\Rules\KnownArgumentNames;
-use Sage\Validator\Rules\KnownArgumentNamesOnDirectives;
-use Sage\Validator\Rules\KnownDirectives;
-use Sage\Validator\Rules\KnownFragmentNames;
-use Sage\Validator\Rules\KnownTypeNames;
-use Sage\Validator\Rules\LoneAnonymousOperation;
-use Sage\Validator\Rules\LoneSchemaDefinition;
-use Sage\Validator\Rules\NoFragmentCycles;
-use Sage\Validator\Rules\NoUndefinedVariables;
-use Sage\Validator\Rules\NoUnusedFragments;
-use Sage\Validator\Rules\NoUnusedVariables;
-use Sage\Validator\Rules\OverlappingFieldsCanBeMerged;
-use Sage\Validator\Rules\PossibleFragmentSpreads;
-use Sage\Validator\Rules\ProvidedRequiredArguments;
-use Sage\Validator\Rules\ProvidedRequiredArgumentsOnDirectives;
-use Sage\Validator\Rules\QueryComplexity;
-use Sage\Validator\Rules\QueryDepth;
-use Sage\Validator\Rules\QuerySecurityRule;
-use Sage\Validator\Rules\ScalarLeafs;
-use Sage\Validator\Rules\SingleFieldSubscription;
-use Sage\Validator\Rules\UniqueArgumentNames;
-use Sage\Validator\Rules\UniqueDirectivesPerLocation;
-use Sage\Validator\Rules\UniqueFragmentNames;
-use Sage\Validator\Rules\UniqueInputFieldNames;
-use Sage\Validator\Rules\UniqueOperationNames;
-use Sage\Validator\Rules\UniqueVariableNames;
-use Sage\Validator\Rules\ValidationRule;
-use Sage\Validator\Rules\ValuesOfCorrectType;
-use Sage\Validator\Rules\VariablesAreInputTypes;
-use Sage\Validator\Rules\VariablesInAllowedPosition;
+
 use function sprintf;
 use Throwable;
 
@@ -61,7 +28,7 @@ use Throwable;
  * Each are expected to return an instance of [Sage\Error\Error](class-reference.md#graphqlerrorerror),
  * or array of such instances when invalid.
  */
-class DocumentValidator
+class DocumentContract
 {
     /** @var ValidationRule[] */
     private static $rules = [];

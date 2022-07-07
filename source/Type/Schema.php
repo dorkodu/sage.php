@@ -21,9 +21,6 @@ use Traversable;
  */
 class Schema
 {
-    /** @var Error[] */
-    private $validationErrors;
-
     /** @var Type[] */
     public $types = [];
 
@@ -40,9 +37,10 @@ class Schema
      */
     public function entityType(string $name)
     {
-        return array_key_exists($name, $this->types)
-          ? $this->types[$name]
-          : null;
+        return
+          array_key_exists($name, $this->types)
+            ? $this->types[$name]
+            : null;
     }
 
     /**
@@ -52,7 +50,7 @@ class Schema
      *
      * @api
      */
-    public function newEntityType(Entity $type)
+    public function addEntityType(Entity $type)
     {
         $this->types[$type->name] = $type;
     }
@@ -88,14 +86,12 @@ class Schema
 
     /**
      * @api
-     *
-     * @param Type[] $types
      */
-    public function __construct(array $types)
+    public function __construct(array $settings)
     {
         // Create schema from array
-        if (is_array($config)) {
-            $config = static::create($config);
+        if (is_array($settings)) {
+            $settings = static::create($settings);
         }
 
         /*
@@ -111,31 +107,23 @@ class Schema
              */
 
             Utils::invariant(
-                $config instanceof SchemaConfig,
-                'Schema constructor expects an array with string keys as Entity type names and values as Entity types, but got: %s',
-                Utils::getVariableType($config)
+                $settings instanceof SchemaConfig,
+                'Schema constructor expects an array with string keys as option names and values, but got: %s',
+                Utils::getVariableType($settings)
             );
 
             /*
              ? Example of an invariant violation:
              *
              * Utils::invariant(
-             *  !$config->types || is_array($config->types) || is_callable($config->types),
-             *  '"types" must be array or callable if provided but got: ' . Utils::getVariableType($config->types)
+             *  !$settings->types || is_array($settings->types) || is_callable($settings->types),
+             *  '"types" must be array or callable if provided but got: ' . Utils::getVariableType($settings->types)
              * );
              */
         }
 
-        if (null !== $config->query) {
-            $this->resolvedTypes[$config->query->name] = $config->query;
-        }
-
-        if (null !== $config->mutation) {
-            $this->resolvedTypes[$config->mutation->name] = $config->mutation;
-        }
-
-        if (null !== $config->subscription) {
-            $this->resolvedTypes[$config->subscription->name] = $config->subscription;
+        if (null !== $settings->query) {
+            $this->resolvedTypes[$settings->query->name] = $settings->query;
         }
 
         if (is_array($this->config->types)) {
@@ -164,6 +152,34 @@ class Schema
     }
 
     /**
+     * Converts an array of options to instance of SchemaConfig
+     * (or just returns empty config when array is not passed).
+     *
+     * @param array<string, mixed> $options
+     *
+     * @api
+     */
+    public static function create(array $options = []): self
+    {
+        $settings = new static();
+
+        if (count($options) > 0) {
+            if (isset($options['types'])) {
+                $settings->setTypes($options['types']);
+            }
+
+            if (isset($options['typeLoader'])) {
+                $settings->setTypeLoader($options['typeLoader']);
+            }
+
+            if (isset($options['assumeValid'])) {
+                $settings->setAssumeValid($options['assumeValid']);
+            }
+        }
+        return $settings;
+    }
+
+    /**
      * @return Generator
      */
     private function resolveAdditionalTypes()
@@ -175,13 +191,24 @@ class Schema
         }
 
         if (!is_array($types) && !$types instanceof Traversable) {
-            throw new InvariantViolation(sprintf('Schema types callable must return array or instance of Traversable but got: %s', Utils::getVariableType($types)));
+            throw new InvariantViolation(
+                sprintf(
+                    'Schema types callable must return array or instance of Traversable but got: %s',
+                    Utils::getVariableType($types)
+                )
+            );
         }
 
         foreach ($types as $index => $type) {
             $type = self::resolveType($type);
             if (!$type instanceof Type) {
-                throw new InvariantViolation(sprintf('Each entry of schema types must be instance of Sage\Type\Definition\Type but entry at %s is %s', $index, Utils::printSafe($type)));
+                throw new InvariantViolation(
+                    sprintf(
+                        'Each entry of schema types must be instance of Sage\Type\Definition\Type but entry at %s is %s',
+                        $index,
+                        Utils::printSafe($type)
+                    )
+                );
             }
             yield $type;
         }
