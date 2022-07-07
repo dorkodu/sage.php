@@ -1,34 +1,63 @@
 <?php
 
-use Blog\DataSource;
+use PinkFloyd\DataSource;
 use Sage\ContextInfo;
 use Sage\Type\Schema;
 use Sage\Type\Definition\Type;
 use Sage\Type\Definition\Entity;
 use Sage\Type\Definition\Attribute;
+use Sage\Type\Definition\Link;
 
 //? Define Types Below
 $schema = new Schema([
-  'User' => $User,
+  'types' => [
+    $Album, $Song, $Member, $Band, $Review
+  ]
 ]);
 
 //? Entities
-
-//TODO: implement new acts for User: create, delete, update
-
-$User = new Entity([
-  'name' => 'User',
+$Album = new Entity([
+  'name' => 'Album',
   'description' => 'Represents a user of the app.',
   'attributes' => [
-    'name' => $name,
-    'email' => $email,
+    'name' => new Attribute([
+      'name'        => 'name',
+      'description' => 'Name of a User.',
+      'rule'        => function(){}, // Type::nonNull(Type::string())
+      'resolve'     => function ($referenceValue) {
+          $id = $referenceValue['user.id'];
+          $user = DataSource::getUserById($id);
+          return $user->email;
+      },
+    ]),
+    'email' => new Attribute([
+      'name'        => 'email',
+      'description' => 'Email of a User.',
+      'rule'      => function(){},
+      'resolve'     => function ($referenceValue) {
+          $id = $referenceValue['user.id'];
+          $user = DataSource::getUserById($id);
+          return $user->email;
+      },
+    ]),
   ],
   'acts' => [
-    'create' => $act_create,
-    'delete' => $act_delete,
-    'update' => $act_update,
+    'create' => new Act([
+      'name' => 'addNote',
+      'description' => 'Saves a note to the data source.',
+      'do' => function ($referenceValue) {
+        $id = $referenceValue['user.id'];
+        DataSource::savePost($id);
+      }
+    ]),
+    'delete' => function() {},
+    'update' => function() {},
   ],
-  'links' => [],
+  'links' => [
+    'notes' => new Link([
+      
+    ]) 
+  ],
   'resolve' => function ($query, $context) {
       $id = $query->argument('id');
 
@@ -51,25 +80,6 @@ $Note = new Entity([
 
 //? Attributes
 
-$name = new Attribute([
-  'name'        => 'name',
-  'description' => 'Name of a User.',
-  'type'        => Type::string(),
-  'resolve'     => function ($referenceValue, ContextInfo $info) {
-      $id = $referenceValue['user.id'];
-      $user = DataSource::getUserById($id);
+$name = ;
 
-      return $user->email;
-  },
-]);
-
-$email = new Attribute([
-  'name'        => 'email',
-  'description' => 'Email of a User.',
-  'resolve'     => function ($referenceValue, ContextInfo $info) {
-      $id = $referenceValue['userId'];
-      $user = DataSource::getUserById($id);
-
-      return $user->email;
-  },
-]);
+$email = ;

@@ -117,13 +117,13 @@ use [`Sage\Server\ServerConfig`](reference.md#Sageserverserverconfig) instead of
 use Sage\Server\ServerConfig;
 use Sage\Server\StandardServer;
 
-$config = ServerConfig::create()
+$settings = ServerConfig::create()
     ->setSchema($schema)
     ->setErrorFormatter($myFormatter)
     ->setDebugFlag($debug)
 ;
 
-$server = new StandardServer($config);
+$server = new StandardServer($settings);
 ```
 
 ## Query batching

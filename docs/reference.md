@@ -325,11 +325,11 @@ Could be passed directly to schema constructor. List of options accepted by **cr
 
 Usage example:
 
-    $config = SchemaConfig::create()
+    $settings = SchemaConfig::create()
         ->setQuery($myQueryType)
         ->setTypeLoader($myTypeLoader);
     
-    $schema = new Schema($config);
+    $schema = new Schema($settings);
 
 **Class Methods:** 
 ```php
@@ -477,20 +477,20 @@ then supplied to the validator and executor. Usage Example:
 
 Or using Schema Config instance:
 
-    $config = Sage\Type\SchemaConfig::create()
+    $settings = Sage\Type\SchemaConfig::create()
         ->setQuery($MyAppQueryRootType)
         ->setMutation($MyAppMutationRootType);
     
-    $schema = new Sage\Type\Schema($config);
+    $schema = new Sage\Type\Schema($settings);
 
 **Class Methods:** 
 ```php
 /**
- * @param mixed[]|SchemaConfig $config
+ * @param mixed[]|SchemaConfig $settings
  *
  * @api
  */
-function __construct($config)
+function __construct($settings)
 ```
 
 ```php
@@ -1524,11 +1524,11 @@ Usage Example:
 
 Or using [ServerConfig](reference.md#Sageserverserverconfig) instance:
 
-    $config = Sage\Server\ServerConfig::create()
+    $settings = Sage\Server\ServerConfig::create()
         ->setSchema($mySchema)
         ->setContext($myContext);
     
-    $server = new Sage\Server\StandardServer($config);
+    $server = new Sage\Server\StandardServer($settings);
     $server->handleRequest();
 
 See [dedicated section in docs](executing-queries.md#using-server) for details.
@@ -1553,11 +1553,11 @@ static function send500Error($error, $debug = false, $exitWhenDone = false)
 /**
  * Creates new instance of a standard Sage HTTP server
  *
- * @param ServerConfig|mixed[] $config
+ * @param ServerConfig|mixed[] $settings
  *
  * @api
  */
-function __construct($config)
+function __construct($settings)
 ```
 
 ```php
@@ -1649,11 +1649,11 @@ Could be passed directly to server constructor. List of options accepted by **cr
 
 Usage example:
 
-    $config = Sage\Server\ServerConfig::create()
+    $settings = Sage\Server\ServerConfig::create()
         ->setSchema($mySchema)
         ->setContext($myContext);
     
-    $server = new Sage\Server\StandardServer($config);
+    $server = new Sage\Server\StandardServer($settings);
 
 **Class Methods:** 
 ```php
@@ -1661,13 +1661,13 @@ Usage example:
  * Converts an array of options to instance of ServerConfig
  * (or just returns empty config when array is not passed).
  *
- * @param mixed[] $config
+ * @param mixed[] $settings
  *
  * @return ServerConfig
  *
  * @api
  */
-static function create(array $config = [])
+static function create(array $settings = [])
 ```
 
 ```php
@@ -1854,7 +1854,7 @@ function validateOperationParams(Sage\Server\OperationParams $params)
  *
  * @api
  */
-function executeOperation(Sage\Server\ServerConfig $config, Sage\Server\OperationParams $op)
+function executeOperation(Sage\Server\ServerConfig $settings, Sage\Server\OperationParams $op)
 ```
 
 ```php
@@ -1868,7 +1868,7 @@ function executeOperation(Sage\Server\ServerConfig $config, Sage\Server\Operatio
  *
  * @api
  */
-function executeBatch(Sage\Server\ServerConfig $config, array $operations)
+function executeBatch(Sage\Server\ServerConfig $settings, array $operations)
 ```
 
 ```php

@@ -42,7 +42,7 @@ class Error extends Exception implements JsonSerializable, ClientAware
    * Note that if this Error represents more than one node, the source may not
    * represent nodes after the first node.
    *
-   * @var Source|null
+   * @var Document|null
    */
   private $source;
 
@@ -70,7 +70,6 @@ class Error extends Exception implements JsonSerializable, ClientAware
     $previous = null,
     array $meta = []
   ) {
-
     parent::__construct($message, 0, $previous);
 
     $this->locations  = $locations;
@@ -87,8 +86,8 @@ class Error extends Exception implements JsonSerializable, ClientAware
       $this->isClientSafe = false;
       $this->category     = self::CATEGORY_INTERNAL;
     } else {
-      $this->isClientSafe = true;
-      $this->category     = self::CATEGORY_SAGE;
+        $this->isClientSafe = true;
+        $this->category     = self::CATEGORY_SAGE;
     }
   }
 
@@ -132,7 +131,7 @@ class Error extends Exception implements JsonSerializable, ClientAware
       $message = (string) $error;
     }
 
-    return new static(
+  return new static(
       $message === '' || $message === null ? 'An unknown error occurred.' : $message,
       $nodes,
       $source,
@@ -163,10 +162,10 @@ class Error extends Exception implements JsonSerializable, ClientAware
    * An array of locations within the source Sage document which correspond to this error.
    *
    * Each entry has information about query name and the requested artifact's name with given artifact type within source Sage document:
-   * 
+   *
    * $location->query;
    * $location->artifact;
-   *    
+   *
    * Errors during execution include a single location, the query field which produced the error.
    *
    * @return ErrorLocation[]
@@ -201,9 +200,9 @@ class Error extends Exception implements JsonSerializable, ClientAware
     ];
 
     $locations = Utils::map(
-      $this->locations(),
+    $this->locations(),
       function (ErrorLocation $loc) {
-        return $loc->toSerializableArray();
+          return $loc->toSerializableArray();
       }
     );
 

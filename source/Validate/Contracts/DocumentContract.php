@@ -28,7 +28,7 @@ use Throwable;
  * Each are expected to return an instance of [Sage\Error\Error](class-reference.md#graphqlerrorerror),
  * or array of such instances when invalid.
  */
-class DocumentValidator
+class DocumentContract
 {
     /** @var ValidationRule[] */
     private static $rules = [];
